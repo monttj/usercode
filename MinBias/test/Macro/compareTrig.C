@@ -34,8 +34,8 @@ void compareTrig(){
       double nu_data = num_data->GetBinContent(i,j);
       double nu_mc = num_mc->GetBinContent(i,j);
 
-      double xerr = sigma(nu_data, de_data,3);
-      double yerr = sigma(nu_mc, de_mc,3);
+      double xerr = sigma(nu_data, de_data, 3);
+      double yerr = sigma(nu_mc, de_mc, 3);
  
       if(debug){
         cout << "data= " << nu_data << " err= " << xerr << endl;
@@ -58,6 +58,11 @@ void compareTrig(){
     y->SetMarkerColor(4);
     x->SetLineColor(2);
     y->SetLineColor(4);
+    x->GetXaxis()->LabelsOption("v");
+    y->GetXaxis()->LabelsOption("v");
+
+    c->SetBottomMargin(0.35);
+
   
     TLegend *l= new TLegend(0.6,0.91,1.0,1.0);
     l->SetHeader(na);
@@ -97,8 +102,10 @@ double combinederror(double nu, double de){
   double nu_err=0;
   double de_err=0;
   if( nu != 0 ) nu_err = sqrt(nu)/nu;
-  if( de != 0 ) de_err = sqrt(de)/de;
-  err = de*sqrt(nu_err*nu_err+de_err*de_err);
+  if( de != 0 ) {
+    de_err = sqrt(de)/de;
+    err = (nu/de)*sqrt(nu_err*nu_err+de_err*de_err);
+  }
   return err;
 }
 
