@@ -8,35 +8,38 @@ void clearXErrorBar(TGraphAsymmErrors * gr)
    }
 }
 
-
 void compareTrigAsym(){
   
-  TFile *f1 = TFile::Open("hltmenu_1TeV_1.0e10_startup_run122314_PD_MinBias_ohlt_all_2009_12_3.root");
-  TFile *f2 = TFile::Open("hltmenu_1TeV_1.0e10_startup_pythiaD6T_ohlt_30k_2009_12_3.root");
+  //TFile *f1 = TFile::Open("MinimumBias123596_hist.root");
+  TFile *f1 = TFile::Open("MinimumBias-rereco/123596_v5/900GeV_hist.root");
+  //TFile *f2 = TFile::Open("Pythia_MinBias_D6T_900GeV_d20091208_Vertex1207_hist.root");
+  TFile *f2 = TFile::Open("ATLAS_900GeV_hist.root");
 
-  TH2F *overlap_data = (TH2F *) f1->Get("overlap");
-  TH2F *overlap_mc = (TH2F *) f2->Get("overlap");  
-  TH2F *num_data = (TH2F *) f1->Get("trigCorrNum");
-  TH2F *num_mc = (TH2F *) f2->Get("trigCorrNum");
-  
+  TH2F *overlap_data = (TH2F *) f1->Get("hfilled_filled");
+  TH2F *overlap_mc = (TH2F *) f2->Get("hAll");  
+  TH2F *num_data = (TH2F *) f1->Get("hfilled_filled_ct");
+  TH2F *num_mc = (TH2F *) f2->Get("hAll_ct");
 
   int nbin = num_data->GetNbinsY();
-  TH1D *htemp = overlap_data->ProjectionY("htemp",0,0);
+  TH1D *htemp = new TH1D("htemp","htemp",nbin,0,nbin);
   htemp->SetMinimum(0);
   htemp->SetMaximum(1.05);
 
+  for(int i=1 ; i <= nbin ;i++){
+    char *na = num_data->GetYaxis()->GetBinLabel(i);
+    htemp->GetXaxis()->SetBinLabel(i,na);
+  }
+
   for(int i=1 ; i <= nbin ;i++){ 
-    TH1D *nux = new TH1D("nux","nux",nbin,1,nbin+1);
-    TH1D *nuy = new TH1D("nuy","nuy",nbin,1,nbin+1);
-    TH1D *dex = new TH1D("dex","dex",nbin,1,nbin+1);
-    TH1D *dey = new TH1D("dey","dey",nbin,1,nbin+1);
+    TH1D *nux = new TH1D("nux","nux",nbin,0,nbin);
+    TH1D *nuy = new TH1D("nuy","nuy",nbin,0,nbin);
+    TH1D *dex = new TH1D("dex","dex",nbin,0,nbin);
+    TH1D *dey = new TH1D("dey","dey",nbin,0,nbin);
 
     string t = int2string(i);
     string name = "c"+t;
-    TCanvas *c = new TCanvas(name.c_str(),"c",1);
+    TCanvas *c = new TCanvas(name.c_str(),"c",2);
     char *na = num_data->GetYaxis()->GetBinLabel(i);
-    TH1D *x = overlap_data->ProjectionY("xh",0,0);
-    TH1D *y = overlap_mc->ProjectionY("yh",0,0);
 
     //get denominators 
     double de_data = num_data->GetBinContent(i,i);
@@ -70,9 +73,9 @@ void compareTrigAsym(){
     htemp->SetStats(0);
     htemp->Draw("");
     htemp->GetXaxis()->LabelsOption("v");
-    htemp->GetXaxis()->LabelsOption("v");
+    htemp->GetXaxis()->SetLabelSize(0.035);
 
-    //TGaxis *axis4 = new TGaxis(nbin+1,-0.05,nbin+1,1.05,-0.05,1.05,510,"+L"); 
+    //TGaxis *axis4 = new TGaxis(nbin+1,0.0,nbin+1,1.05,0.0,1.05,510,"+L"); 
     //axis4->SetName("axis4"); 
     //axis4->SetLabelOffset(0.01); 
     //axis4->Draw(); 
@@ -92,8 +95,6 @@ void compareTrigAsym(){
     mcErr->BayesDivide(nuy,dey);
     mcErr->Draw("PSame");
     clearXErrorBar(mcErr);
- 
-    c->SetBottomMargin(0.35);
 
     TLegend *l= new TLegend(0.6,0.91,1.0,1.0);
     l->SetHeader(na);
@@ -102,9 +103,12 @@ void compareTrigAsym(){
     l->SetFillColor(0);
     l->SetLineColor(0);
     l->Draw();
+ 
+    c->SetBottomMargin(0.42);
+    string nas = char2string(na);
+    string filename = nas + ".gif";
+    c->Print(filename.c_str());
 
-    x->Clear();
-    y->Clear();
     nux->Clear();
     dex->Clear();
     nuy->Clear();
@@ -119,6 +123,14 @@ string int2string(int i){
   stringstream ss;
   ss << i;
   string s= ss.str();
+  return s;
+}
+
+string char2string(char *c){
+  stringstream ss;
+  string s;
+  ss << c;
+  ss >> s;
   return s;
 }
 
