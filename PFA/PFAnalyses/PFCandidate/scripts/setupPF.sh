@@ -18,8 +18,9 @@ cvs co  -r Patrick_Dec24 -d   PFAnalyses/RootTools  UserCode/PFAnalyses/RootTool
 cvs co -r v31X_021009    TauAnalysis/CandidateTools                       
 cvs co -r v31X_021009    TauAnalysis/GenSimTools 
 
-cvs co  -r TaeJeongAndLorenzo_IsoDepositsReady_Jan19 -d PFAnalyses/PFCandidate  UserCode/PFAnalyses/PFCandidate  
+cvs co  -r Colin_Cleaning_Jan19 -d PFAnalyses/PFCandidate  UserCode/PFAnalyses/PFCandidate  
 addpkg DPGAnalysis/Skims
 cvs co -d TKDPG/BXSelect UserCode/lowette/TKDPG/BXSelect
 scram b -j 4
 
+rm -rf UserCode/Tjkim
