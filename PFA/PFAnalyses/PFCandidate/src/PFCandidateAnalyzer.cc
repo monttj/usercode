@@ -72,13 +72,24 @@ void PFCandidateAnalyzer::initialize(const edm::ParameterSet& ps,
 
   pfCandidateLabel_ = ps.getParameter<edm::InputTag>("pfCandidateLabel");
   fillChargedHadrons_ = ps.getUntrackedParameter<bool>("fillChargedHadrons",true);
+  if( fillChargedHadrons_ ) {
+    fillChargedHadronsIsoDep_ = ps.getUntrackedParameter<bool>("fillChargedHadronsIsoDep",false);
+  }
   fillPhotons_ = ps.getUntrackedParameter<bool>("fillPhotons", true);
   fillMuons_ = ps.getUntrackedParameter<bool>("fillMuons", true);
-  if(fillPhotons_)
+  if(fillMuons_){
+    fillMuonsIsoDep_ = ps.getUntrackedParameter<bool>("fillMuonsIsoDep",false);
+  }
+  if(fillPhotons_){
     usePhotonRawEnergy_ = ps.getParameter<bool>("usePhotonRawEnergy");
+    fillPhotonsIsoDep_ = ps.getUntrackedParameter<bool>("fillPhotonsIsoDep",false);
+  }
   fillElectrons_ = ps.getUntrackedParameter<bool>("fillElectrons", true);
-  if (fillElectrons_) 
+  if (fillElectrons_){ 
     pfRecTrackLabel_ = ps.getParameter<edm::InputTag>("pfRecTrackLabel");
+    fillElectronsIsoDep_ = ps.getUntrackedParameter<bool>("fillElectronsIsoDep",false);
+  }
+  maxDeltaRForIsoDep_ = ps.getUntrackedParameter<double>("maxDeltaRForIsoDep", 1.0);
   tkRefLabel_ = ps.getParameter<edm::InputTag>("tkRefLabel");
 
   ///The histograms for this analyser will be saved into "TestHistos"
@@ -191,6 +202,9 @@ bool PFCandidateAnalyzer::analyze(const edm::EventBase& iEvent){
 
       
       setChargedInfo( tChargedHadrons_->back(), pfc);
+      if(fillChargedHadronsIsoDep_) {
+        setIsoDeposits( (PF::Particle&)tChargedHadrons_->back(), pfc); 
+      }
       
     } else if ( pfc.particleId() == 2 && fillElectrons_){
       // Run on electrons
@@ -210,6 +224,9 @@ bool PFCandidateAnalyzer::analyze(const edm::EventBase& iEvent){
 
       
       setMuonInfo( tMuons_->back(), pfc);
+      if(fillMuonsIsoDep_) {
+        setIsoDeposits( (PF::Particle&)tMuons_->back(), pfc);
+      }
 
     }
     else if ( pfc.particleId() == 4 && fillPhotons_) { 
@@ -431,6 +448,7 @@ void PFCandidateAnalyzer::addPhoton( const reco::PFCandidate& pfc ) const {
       tPhotons_->push_back( Photon( pfc.p4(),  *(elem.clusterRef())) );
     }
 
+    if(fillPhotonsIsoDep_) setIsoDeposits( (PF::Particle&)tPhotons_->back(), pfc);;
     lookForPSClusters( iEcal, block, PFBlockElement::PS1, 
 		       tPhotons_->back().ps1() );
     lookForPSClusters( iEcal, block, PFBlockElement::PS2, 
@@ -736,6 +754,8 @@ void PFCandidateAnalyzer::addElectron( const reco::PFCandidate & pfc) const {
   }
   
   tElectrons_->push_back(myElectron);
+  if(fillElectronsIsoDep_) setIsoDeposits((PF::Particle&)tElectrons_->back(), pfc);
+
 }
 
 
@@ -896,3 +916,37 @@ const reco::PFRecTrack * PFCandidateAnalyzer::findPFRecTrack(const reco::TrackRe
     }
   return 0;
 }
+
+void PFCandidateAnalyzer::setIsoDeposits(PF::Particle& particle, const reco::PFCandidate& pfCandidate) const{
+  std::cout << "test" <<std::endl;
+  reco::isodeposit::Direction pfDir(pfCandidate.eta(), pfCandidate.phi());
+  reco::IsoDeposit::Veto veto;
+  veto.vetoDir = pfDir;
+  veto.dR = 0.05; 
+
+  std::vector<PF::IsoDeposit> deps;
+  //initialization
+  for(int i=0; i<4 ; i++){
+    PF::IsoDeposit dep(pfDir);
+    //dep.setVeto(veto);
+    deps.push_back(dep);
+  }
+
+  for(reco::PFCandidateCollection::const_iterator ci  = pfCandidates_->begin(); ci!=pfCandidates_->end(); ++ci) {  
+    const reco::PFCandidate& pfc = *ci;
+    if( &pfCandidate == &pfc) continue; 
+    LorentzVector pvi(pfc.p4());
+    reco::isodeposit::Direction dirPfc(pfc.eta(), pfc.phi());
+    double dR = pfDir.deltaR(dirPfc);
+    if(dR > maxDeltaRForIsoDep_) continue;
+    double et = pvi.Et();
+    deps[0].addDeposit(dirPfc, et); //all
+    if( pfc.particleId() == 1) deps[1].addDeposit(dirPfc, et); //charged
+    if( pfc.particleId() == 5) deps[2].addDeposit(dirPfc, et); //neutral
+    if( pfc.particleId() == 4) deps[3].addDeposit(dirPfc, et); //gamma
+  }
+
+  particle.setIsoDeposit(deps);
+ 
+}
+       

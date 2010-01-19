@@ -90,6 +90,8 @@ namespace PF {
 
     void setMuonInfo( PF::Muon& muon, 
 			 const reco::PFCandidate& pfc ) const; 
+   
+    void setIsoDeposits(PF::Particle& particle, const reco::PFCandidate& pfCandidate) const; 
 
     const reco::PFRecTrack * findPFRecTrack(const reco::TrackRef& ref) const;
  
@@ -115,6 +117,15 @@ namespace PF {
     bool usePhotonRawEnergy_;
     bool fillElectrons_;
     bool PFRecTracksAvailable_;
+
+    /// iso deposit 
+    bool fillChargedHadronsIsoDep_;
+    bool fillPhotonsIsoDep_;
+    bool fillMuonsIsoDep_;
+    bool fillElectronsIsoDep_;
+
+    /// upper bound for iso deposit
+    double maxDeltaRForIsoDep_;
 
     ///Hadles to the collections used by this 
     ///selector

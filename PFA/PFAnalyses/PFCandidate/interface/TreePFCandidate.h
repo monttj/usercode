@@ -6,6 +6,8 @@
 #include "DataFormats/ParticleFlowReco/interface/PFCluster.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "Math/GenVector/VectorUtil.h"
+#include "PFAnalyses/PFCandidate/interface/Isolation.h"
+#include <map>
 
 namespace PF {
   
@@ -18,8 +20,30 @@ namespace PF {
       Particle( const LorentzVector& mom, int type ) 
 	: LorentzVector(mom), type_(type) {}
     int type() const { return type_; }
+
+    const IsoDeposit * isoDeposit(IsolationKeys key) const {
+      for (IsoDepositPairs::const_iterator it = keyIsoDeposits_.begin(), ed = keyIsoDeposits_.end(); it != ed; ++it) 
+      {
+        if (it->first == key) return &isoDeposits_[it->second];
+      }
+      return 0;
+    } 
+
+    void setIsoDeposit(std::vector<IsoDeposit> deps){ 
+      //need to be improved
+      keyIsoDeposits_.push_back(std::make_pair(PF::PfAllParticleIso, 0));
+      keyIsoDeposits_.push_back(std::make_pair(PF::PfChargedHadronIso, 1));
+      keyIsoDeposits_.push_back(std::make_pair(PF::PfNeutralHadronIso, 2));
+      keyIsoDeposits_.push_back(std::make_pair(PF::PfGammaIso, 3));
+
+      isoDeposits_ = deps;  
+    };
+
   private:
     int type_;
+    typedef std::vector<std::pair<IsolationKeys, int> > IsoDepositPairs;
+    IsoDepositPairs  keyIsoDeposits_;
+    std::vector<IsoDeposit> isoDeposits_;
   };
 
   class PhotonPSInfo {
@@ -248,8 +272,8 @@ namespace PF {
        float hcalene_;
 
   };
-  
-  
+
+
   class ChargedHadron : public Particle {
   public:
     ChargedHadron() {}
