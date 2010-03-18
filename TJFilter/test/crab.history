@@ -1,0 +1,7 @@
+091214_041953: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_6_5/python/crab.py -create
+091214_042128: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_6_5/python/crab.py -create
+091214_042338: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_6_5/python/crab.py -create
+091214_042350: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_6_5/python/crab.py -create
+091214_042458: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_6_5/python/crab.py -create
+091214_042516: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_6_5/python/crab.py -submit
+091214_100819: /afs/cern.ch/cms/ccs/wm/scripts/Crab/CRAB_2_6_5/python/crab.py -status
