@@ -1,48 +1,70 @@
 void beamhaloplot(){
 
-  TFile *f =TFile::Open("Rpceff.root");
+  TFile *f =TFile::Open("Local.root");
+
   
-  TH1F *beamhaloangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/beamhaloangle");
-  TH1F *expectedbeamhaloangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/expectedbeamhaloangle");
-  TH1F *beamhaloxyplaneangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/beamhaloxyplaneangle");
-  TH1F *expectedbeamhaloxyplaneangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/expectedbeamhaloxyplaneangle");
+  TH1F *beamhaloangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/Beamhalo/AnyOccupancyTheta");
+  TH1F *expectedbeamhaloangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/Beamhalo/ExpectedOccupancyTheta");
+  TH1F *beamhaloxyplaneangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/Beamhalo/AnyOccupancyAngleToStrip");
+  TH1F *expectedbeamhaloxyplaneangle = (TH1F *) f->Get("/DQMData/Muons/MuonSegEff/Beamhalo/ExpectedOccupancyAngleToStrip");
+
+  TH2F *ResidualTheta = (TH2F *) f->Get("/DQMData/Muons/MuonSegEff/Beamhalo/ResidualTheta");
 
   vector<string> Region;
   Region.push_back("Endcap+");
   Region.push_back("Endcap-");
-  TH1F *deforRE12 = new TH1F("deforRE12","deforRE12",28,0,28);
-  TH1F *nuforRE12 = new TH1F("nuforRE12","nuforRE12",28,0,28);
   TH1F *de = new TH1F("de","de",32,0,32);
   TH1F *nu = new TH1F("nu","nu",32,0,32);
   TH1F *deroll = new TH1F("deroll","deroll",36,0,36);
   TH1F *nuroll = new TH1F("nuroll","nuroll",36,0,36);
+  TProfile *residulatheta = ResidualTheta->ProfileX("residualtheta",1,200);
+
+  int ybin = ResidualTheta->GetNbinsY();
+  int xbin = ResidualTheta->GetNbinsX();
+  int sbin = ResidualTheta->GetBinWidth(1);
+
+  TH1D *h_rms = new TH1D("h_rms","h_rms",xbin,0,xbin*sbin);
+  
+  for(int i=1; i <= xbin ; i++){
+    TH1D *temp = ResidualTheta->ProjectionY("temp",i,i);
+    double rms = temp->GetRMS();
+    double rmserr = temp->GetRMSError();
+    cout << "i= " << i << " " << rms << " +- " << rmserr << endl;
+    h_rms->SetBinContent(i,rms);
+    h_rms->SetBinError(i,rmserr);
+    temp->Delete();
+  }
+
   int nderoll[36];
   int nnuroll[36];
+  for(int i=0; i< 36 ; i++){
+    nnuroll[i]=0;
+    nderoll[i]=0;
+  }
 
-  for(int region = 0 ; region < 1; region++){
+  for(int region = 0 ; region < 2; region++){
     for(int nch = 1 ; nch <=36 ; nch++){
       for(int ndisk = 1 ; ndisk <= 3 ; ndisk++){
         for(int nring = 2; nring < 4 ; nring++){
           for(int narea = 0 ; narea < 3; narea++){
             string sign = "+";
-            if(region == 1) sign="-"; 
+            string dsign = "";
+            if(region == 1) {
+              sign="-"; 
+              dsign="-";
+            }
             string disk = int2string(ndisk);
             string ring = int2string(nring);
             string sector = int2sector(nch);
             string ch = int2ch(nch);
             string area = int2area(narea);
 
-            string sde = Region[region]+"/Disk_"+disk+"/ring_"+ring+"/sector_"+sector+"/ExpectedOccupancy_RE"+sign+disk+"_R"+ring+"_"+ch+"_"+area;
-            string snu = Region[region]+"/Disk_"+disk+"/ring_"+ring+"/sector_"+sector+"/RPCDataOccupancy_RE"+sign+disk+"_R"+ring+"_"+ch+"_"+area;
+            string sde = Region[region]+"/Disk_"+dsign+disk+"/ring_"+ring+"/sector_"+sector+"/ExpectedOccupancy_RE"+sign+disk+"_R"+ring+"_"+ch+"_"+area;
+            string snu = Region[region]+"/Disk_"+dsign+disk+"/ring_"+ring+"/sector_"+sector+"/RPCDataOccupancy_RE"+sign+disk+"_R"+ring+"_"+ch+"_"+area;
             TH1F *detemp = (TH1F *) f->Get(Form("/DQMData/Muons/MuonSegEff/%s",sde));
             TH1F *nutemp = (TH1F *) f->Get(Form("/DQMData/Muons/MuonSegEff/%s",snu));
-            if(ndisk == 1 && nring == 2){
-              deforRE12->Add(detemp);
-              nuforRE12->Add(nutemp);
-            }else{
-              de->Add(detemp);
-              nu->Add(nutemp);
-            }
+            de->Add(detemp);
+            nu->Add(nutemp);
             nderoll[nch-1] = nderoll[nch-1] + detemp->GetEntries();
             nnuroll[nch-1] = nnuroll[nch-1] + nutemp->GetEntries();
           }
@@ -57,16 +79,13 @@ void beamhaloplot(){
   }
 
   TGraphAsymmErrors *beamhaloErr = new TGraphAsymmErrors();
-  ploteff(beamhaloangle,expectedbeamhaloangle,beamhaloErr,"Efficiency","#theta","beamhalo_angle");
+  ploteff(beamhaloangle,expectedbeamhaloangle,beamhaloErr,"Efficiency","global theta (#theta)","beamhalo_angle");
 
   TGraphAsymmErrors *beamhaloxyErr = new TGraphAsymmErrors();
-  ploteff(beamhaloxyplaneangle,expectedbeamhaloxyplaneangle,beamhaloxyErr,"Efficiency","#theta","beamhalo_xyangle");
+  ploteff(beamhaloxyplaneangle,expectedbeamhaloxyplaneangle,beamhaloxyErr,"Efficiency","global theta (#theta)","beamhalo_xyangle");
 
   TGraphAsymmErrors *effErr = new TGraphAsymmErrors();
   ploteff(nu,de,effErr,"Efficiency","strip","eff_strip");
-
-  TGraphAsymmErrors *effErrforRE12 = new TGraphAsymmErrors();
-  ploteff(nuforRE12,deforRE12,effErrforRE12,"Efficiency","strip","eff_strip_forRE12");
 
   TGraphAsymmErrors *effrollErr = new TGraphAsymmErrors();
   ploteff(nuroll,deroll,effrollErr,"Efficiency","roll","eff_roll");
@@ -76,12 +95,28 @@ void beamhaloplot(){
   nuroll->SetStats(0);
   nuroll->Draw();
   deroll->Draw("Same");
+  nuroll->GetXaxis()->SetTitle("roll");
+  nuroll->GetYaxis()->SetTitle("Occupancy");
+
+  TCanvas *c_residualtheta = new TCanvas("c_residualtheta","c_residualtheta",1);
+  residualtheta->Draw();
+  residualtheta->GetXaxis()->SetTitle("global theta (#theta)");
+  residualtheta->GetYaxis()->SetTitle("Residual (cm)");
+
+  TCanvas *c_rms = new TCanvas("c_rms","c_rms",1);
+  h_rms->SetMaximum(11);
+  h_rms->SetMarkerStyle(20);
+  h_rms->SetMarkerSize(1.2);
+  h_rms->Draw("P");
+  h_rms->GetXaxis()->SetTitle("global theta (#theta)");
+  h_rms->GetYaxis()->SetTitle("sigma");
 
 }
 
 void ploteff(TH1F *nu, TH1F *de, TGraphAsymmErrors *beamhaloErr, TString ytitle, TString xtitle, TString name){
   int nbin = nu->GetNbinsX();
-  TH1D *htemp = new TH1D(Form("c_%s",name.Data()),Form("c_%s",name.Data()),nbin,0,nbin);
+  int binsize = nu->GetBinWidth(1);
+  TH1D *htemp = new TH1D(Form("c_%s",name.Data()),Form("c_%s",name.Data()),nbin,0,nbin*binsize);
   htemp->SetMinimum(0);
   htemp->SetMaximum(1.05);
   htemp->SetTitle("");
@@ -92,10 +127,12 @@ void ploteff(TH1F *nu, TH1F *de, TGraphAsymmErrors *beamhaloErr, TString ytitle,
   TCanvas *c = new TCanvas(Form("c_%s",name.Data()),Form("c_%s",name.Data()),1);
   htemp->Draw("");
   beamhaloErr->SetMarkerStyle(20);
-  beamhaloErr->SetMarkerSize(0.8);
+  beamhaloErr->SetMarkerSize(0.1);
   beamhaloErr->BayesDivide(nu,de);
   beamhaloErr->Draw("PSame");
   clearXErrorBar(beamhaloErr);
+ 
+  c->Print(Form("c_%s.eps",name.Data()));
 }
 
 void clearXErrorBar(TGraphAsymmErrors * gr)
