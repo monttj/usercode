@@ -170,6 +170,7 @@ void TagProveZmmAnalyzer::clear(){
   muonMultiplicity_ = 0;
   SelectedMuons_.clear();
   Zmass_ = 0; 
+  provedZmass_ = 0; 
   //Z_.clear(); // no member function clear() 
 
 }
