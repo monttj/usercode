@@ -47,12 +47,17 @@ PFCandidateAnalyzer:: PFCandidateAnalyzer(const std::string & aName) :
  {
    
    tChargedHadrons_ = new vector< ChargedHadron > ();
+   tCleanedChannels_ = new vector< CleanedChannel > ();
    tPhotons_ = new vector< Photon > ();
    tMuons_ = new vector< Muon > ();
    tElectrons_ = new vector< Electron > ();
-   
-   calibration_ =  new PFEnergyCalibration( 0., 0., 0., 0., 0., 0., 0., 0., 2);
+   tNeutralHadrons_ = new vector< Particle > ();
+   tRandomCones_ = new vector< RandomCone > ();
+   tHFs_ = new vector< Particle > ();
+   tTriggerInformation_ = new TriggerInformation();
 
+   calibration_ =  new PFEnergyCalibration( 0., 0., 0., 0., 0., 0., 0., 0., 2);
+   tRandom_ = new TRandom3();
  }
 
 
@@ -72,9 +77,19 @@ void PFCandidateAnalyzer::initialize(const edm::ParameterSet& ps,
 
   pfCandidateLabel_ = ps.getParameter<edm::InputTag>("pfCandidateLabel");
   fillChargedHadrons_ = ps.getUntrackedParameter<bool>("fillChargedHadrons",true);
+
+  fillRandomCones_ = ps.getUntrackedParameter<bool>("fillRandomCones",false);
+  numOfRandomCones_ = ps.getUntrackedParameter<unsigned int>("numOfRandomCones",10);
+  maxEtaRandomCones_ = ps.getUntrackedParameter<double>("maxEtaRandomCones",3.);
+  useMuonDirForRandom_= ps.getUntrackedParameter<bool>("useMuonDirForRandom",false);
+  muonLabel_ =  ps.getParameter<edm::InputTag>("muonLabel");
+
   if( fillChargedHadrons_ ) {
     fillChargedHadronsIsoDep_ = ps.getUntrackedParameter<bool>("fillChargedHadronsIsoDep",false);
+    ptMinChargedHadrons_ = ps.getUntrackedParameter<double>("ptMinChargedHadrons",-1);
+    nTracksInBlockMax_  = ps.getUntrackedParameter<int>("nTracksInBlockMax",999999);
   }
+  fillNeutralHadrons_ = ps.getUntrackedParameter<bool>("fillNeutralHadrons",true);
   fillPhotons_ = ps.getUntrackedParameter<bool>("fillPhotons", true);
   fillMuons_ = ps.getUntrackedParameter<bool>("fillMuons", true);
   if(fillMuons_){
@@ -91,6 +106,17 @@ void PFCandidateAnalyzer::initialize(const edm::ParameterSet& ps,
   }
   maxDeltaRForIsoDep_ = ps.getUntrackedParameter<double>("maxDeltaRForIsoDep", 1.0);
   tkRefLabel_ = ps.getParameter<edm::InputTag>("tkRefLabel");
+
+  fillHF_ = ps.getUntrackedParameter<bool>("fillHF",true);
+
+  fillCleanedChannels_ = ps.getUntrackedParameter<bool>("fillCleanedChannels",true);
+  if ( fillCleanedChannels_ ) { 
+    cleanedHFShortLabel_ = ps.getParameter<edm::InputTag>("cleanedHFShortLabel");
+    cleanedHFEMLabel_ = ps.getParameter<edm::InputTag>("cleanedHFEMLabel");
+    cleanedHFHADLabel_ = ps.getParameter<edm::InputTag>("cleanedHFHADLabel");
+    cleanedHCALLabel_ = ps.getParameter<edm::InputTag>("cleanedHCALLabel");
+    cleanedECALLabel_ = ps.getParameter<edm::InputTag>("cleanedECALLabel");
+  }
 
   ///The histograms for this analyser will be saved into "TestHistos"
   ///directory of the ROOT file
@@ -127,40 +153,21 @@ bool PFCandidateAnalyzer::analyze(const edm::EventBase& iEvent){
 
   clear();
 
-  iEvent.getByLabel(tkRefLabel_,tkRef_);    
-  const reco::TrackCollection* tkColl = tkRef_.product();
 
-  //std::cout << "Total Number of Tracks " << tkColl->size() << endl;
-
-  bool accepted = false;
-  int numhighpurity=0;
-  double fraction = 1.;
-  reco::TrackBase::TrackQuality _trackQuality = reco::TrackBase::qualityByName("highPurity");
-
-  if(tkColl->size()>10){ 
-    reco::TrackCollection::const_iterator itk = tkColl->begin();
-    reco::TrackCollection::const_iterator itk_e = tkColl->end();
-    for(;itk!=itk_e;++itk){
-      // std::cout << "HighPurity?  " << itk->quality(_trackQuality) << std::endl;
-      if(itk->quality(_trackQuality)) numhighpurity++;
-    }
-    fraction = (float)numhighpurity/(float)tkColl->size();
-    if(fraction>0.25) accepted=true;
-  }else{
-    //if less than 10 Tracks accept the event anyway    
-    accepted= true;
-  }
-  if ( !accepted ) return false;
-  
   iEvent.getByLabel(pfCandidateLabel_,pfCandidates_);
+  iEvent.getByLabel(muonLabel_,muons_);
 
-  // check if the RecTracks (display event content) 
-  // or track-extra (RECO event contennt )are available. Only needed if electrons are used
+  if(fillElectrons_) {
+    PFRecTracksAvailable_=iEvent.getByLabel(pfRecTrackLabel_,pfRecTracks_);
+  }
 
-  if(fillElectrons_)
-    {
-      PFRecTracksAvailable_=iEvent.getByLabel(pfRecTrackLabel_,pfRecTracks_);
-    }
+  if(fillCleanedChannels_) { 
+    cleanedHFShortAvailable_ = iEvent.getByLabel(cleanedHFShortLabel_, cleanedHFShort_);
+    cleanedHFEMAvailable_ = iEvent.getByLabel(cleanedHFEMLabel_, cleanedHFEM_);
+    cleanedHFHADAvailable_ = iEvent.getByLabel(cleanedHFHADLabel_, cleanedHFHAD_);
+    cleanedHCALAvailable_ = iEvent.getByLabel(cleanedHCALLabel_, cleanedHCAL_);
+    cleanedECALAvailable_ = iEvent.getByLabel(cleanedECALLabel_, cleanedECAL_);
+  }
 
   run_ = iEvent.id().run();
   event_ = iEvent.id().event();
@@ -185,59 +192,57 @@ bool PFCandidateAnalyzer::analyze(const edm::EventBase& iEvent){
     myHistos_->fill1DHistogram("hPFCandidateEt",pfc.et(),eventWeight_);    
     myHistos_->fill2DHistogram("hPFCandidateEtVsEta",pfc.eta(),pfc.et(), eventWeight_);    
     
-    LorentzVector pvi(pfc.p4());
-
-    if ( pfc.particleId() == 1 && fillChargedHadrons_ ) {
-      // Run on charged particle tracks
-      // Fill only if pt > 1.
-      if ( pfc.pt() < 1. ) continue;
-      tChargedHadrons_->push_back(ChargedHadron( pvi, 
-						 pfc.rawEcalEnergy(), 
-						 pfc.rawHcalEnergy(),
-						 pfc.particleId() ) );
-      
-      tChargedHadrons_->back().setPosEcal( math::XYZPoint( pfc.positionAtECALEntrance().x(),
-						  pfc.positionAtECALEntrance().y(),
-						  pfc.positionAtECALEntrance().z()) ); 
-
-      
-      setChargedInfo( tChargedHadrons_->back(), pfc);
-      if(fillChargedHadronsIsoDep_) {
-        setIsoDeposits( (PF::Particle&)tChargedHadrons_->back(), pfc); 
-      }
-      
-    } else if ( pfc.particleId() == 2 && fillElectrons_){
-      // Run on electrons
+    if ( fillChargedHadrons_ && pfc.particleId() == PFCandidate::h) {
+      if( pfc.pt()>ptMinChargedHadrons_)
+	addChargedHadron( pfc );       
+    } else if ( fillElectrons_ && pfc.particleId() == PFCandidate::e ){
       addElectron (pfc ) ;      
     }
-    else if( pfc.particleId() == 3 && fillMuons_) { 
-      // Run on Muons
-      
-      tMuons_->push_back(Muon( pvi, 
-			       pfc.rawEcalEnergy(), 
-			       pfc.rawHcalEnergy(),
-			       pfc.particleId() ) );
-      
-      tMuons_->back().setPosEcal( math::XYZPoint( pfc.positionAtECALEntrance().x(),
-						  pfc.positionAtECALEntrance().y(),
-						  pfc.positionAtECALEntrance().z()) ); 
-
-      
-      setMuonInfo( tMuons_->back(), pfc);
-      if(fillMuonsIsoDep_) {
-        setIsoDeposits( (PF::Particle&)tMuons_->back(), pfc);
-      }
-
+    else if( fillMuons_ && pfc.particleId() == PFCandidate::mu) { 
+      addMuon( pfc );
     }
-    else if ( pfc.particleId() == 4 && fillPhotons_) { 
-      // Run on photons
+    else if ( fillPhotons_ && 
+	      pfc.particleId() == PFCandidate::gamma) { 
       addPhoton( pfc );
-    } else if ( pfc.particleId() == 5 ) { 
-      // Run on neutral hadrons
-      ;
+    } 
+    else if ( fillNeutralHadrons_ && 
+	      pfc.particleId() == PFCandidate::h0 ) { 
+      addNeutralHadron( pfc ); 
     }
+    else if ( fillHF_ && ( pfc.particleId() == PFCandidate::h_HF || 
+			   pfc.particleId() == PFCandidate::egamma_HF ) )
+      addHF( pfc );
   }
 
+  if(fillRandomCones_) addRandomCones(numOfRandomCones_,maxEtaRandomCones_);
+  setTriggerInformation();
+
+  if ( fillCleanedChannels_ ) { 
+    for( CIR cir  = cleanedHFShort_->begin(); cir!=cleanedHFShort_->end(); ++cir)  {
+      const reco::PFRecHit& pfr = *cir;
+      if ( pfr.rescale() < 1E-9 ) 
+	addCleanedChannel(pfr,0);
+      else
+	addCleanedChannel(pfr,10,pfr.rescale());
+    }
+    for( CIR cir  = cleanedHFEM_->begin(); cir!=cleanedHFEM_->end(); ++cir)  {
+      const reco::PFRecHit& pfr = *cir;
+      if ( pfr.rescale() < 1E-9 ) addCleanedChannel(pfr,1);
+    }
+    for( CIR cir  = cleanedHFHAD_->begin(); cir!=cleanedHFHAD_->end(); ++cir)  {
+      const reco::PFRecHit& pfr = *cir;
+      if ( pfr.rescale() < 1E-9 ) addCleanedChannel(pfr,2);
+    }
+    for( CIR cir  = cleanedHCAL_->begin(); cir!=cleanedHCAL_->end(); ++cir)  {
+      const reco::PFRecHit& pfr = *cir;
+      if ( pfr.rescale() < 1E-9 ) addCleanedChannel(pfr,3);
+    }
+    for( CIR cir  = cleanedECAL_->begin(); cir!=cleanedECAL_->end(); ++cir)  {
+      const reco::PFRecHit& pfr = *cir;
+      if ( pfr.rescale() < 1E-9 ) addCleanedChannel(pfr,4);
+    }
+  }
+  
   return true;
 }
 
@@ -246,6 +251,9 @@ void PFCandidateAnalyzer::setChargedInfo( PF::ChargedHadron& chargedHadron,
 					  const reco::PFCandidate& pfc ) const {
   // Find the corresponding block
   const PFCandidate::ElementsInBlocks& theElements = pfc.elementsInBlocks();
+  if( theElements.empty() ) {
+    return;
+  }
   const reco::PFBlockRef blockRef = theElements[0].first;
   PFBlock::LinkData linkData =  blockRef->linkData();
   // And the block elements
@@ -267,12 +275,17 @@ void PFCandidateAnalyzer::setChargedInfo( PF::ChargedHadron& chargedHadron,
     }
   }
   //std::cout << "N tracks = " << nTracks << std::endl;
-  if ( nTracks != 1 ) return;
+  if ( !nTracks ) {
+    assert(0);
+  }
+  if (nTracks>(unsigned int)nTracksInBlockMax_) {
+    return;
+  }
 
   const reco::PFBlockElementTrack& et =
     dynamic_cast<const reco::PFBlockElementTrack &>( elements[iTrack] );
 //   double p = et.trackRef()->p();  
-  double pt = et.trackRef()->pt();  
+  //double pt = et.trackRef()->pt();  
   unsigned int nHits = et.trackRef()->found();
   unsigned int tobN = 0;
   unsigned int tecN = 0;
@@ -303,7 +316,10 @@ void PFCandidateAnalyzer::setChargedInfo( PF::ChargedHadron& chargedHadron,
   //unsigned int outer = et.trackRef()->outerDetId();
   unsigned int inner = pxbN+pxdN;
   unsigned int outer = tibN+tobN+tidN+tecN;
-  if ( pt < 1. ) return; 
+
+  //COLIN turn it into an option
+  // if ( pt < 1. ) return; 
+
   // double etat = et.trackRef()->eta();
 
   /*
@@ -384,6 +400,29 @@ void PFCandidateAnalyzer::setChargedInfo( PF::ChargedHadron& chargedHadron,
 }
 
 
+void PFCandidateAnalyzer::addCleanedChannel( const reco::PFRecHit& pfr, int type, double rescale ) const {
+   tCleanedChannels_->push_back(
+	    CleanedChannel( PF::LorentzVector( 
+		     std::sqrt(pfr.position().Perp2()/pfr.position().Mag2())*pfr.energy(),
+		     pfr.position().Eta(),pfr.position().Phi(),0.) , type, rescale ) );
+ }
+
+void PFCandidateAnalyzer::addChargedHadron( const reco::PFCandidate& pfc ) const {
+  tChargedHadrons_->push_back(ChargedHadron( PF::LorentzVector( pfc.p4() ), 
+					     pfc.rawEcalEnergy(), 
+					     pfc.rawHcalEnergy(),
+					     pfc.particleId() ) );
+      
+  tChargedHadrons_->back().setPosEcal( math::XYZPoint( pfc.positionAtECALEntrance().x(),
+						       pfc.positionAtECALEntrance().y(),
+						       pfc.positionAtECALEntrance().z()) ); 
+
+      
+  setChargedInfo( tChargedHadrons_->back(), pfc);
+  if(fillChargedHadronsIsoDep_) {
+    setIsoDeposits( tChargedHadrons_->back(), &pfc); 
+  }
+}
 
 void PFCandidateAnalyzer::addPhoton( const reco::PFCandidate& pfc ) const {
   
@@ -448,7 +487,7 @@ void PFCandidateAnalyzer::addPhoton( const reco::PFCandidate& pfc ) const {
       tPhotons_->push_back( Photon( pfc.p4(),  *(elem.clusterRef())) );
     }
 
-    if(fillPhotonsIsoDep_) setIsoDeposits( (PF::Particle&)tPhotons_->back(), pfc);;
+    if(fillPhotonsIsoDep_) setIsoDeposits( tPhotons_->back(), &pfc);;
     lookForPSClusters( iEcal, block, PFBlockElement::PS1, 
 		       tPhotons_->back().ps1() );
     lookForPSClusters( iEcal, block, PFBlockElement::PS2, 
@@ -515,7 +554,8 @@ void PFCandidateAnalyzer::addElectron( const reco::PFCandidate & pfc) const {
       {
 	reco::PFClusterRef myPFClusterRef= pfbe.clusterRef();
 	const reco::PFCluster & myPFCluster (*myPFClusterRef);
-	myElectron.addCluster(myPFCluster.position(),myPFCluster.energy());
+	//	std::cout << " uncorrected " << myPFCluster.energy() << " corrected" <<  correspondingDaughterCandidate(pfc,pfbe).ecalEnergy()<< std::endl;
+	myElectron.addCluster(myPFCluster.position(),correspondingDaughterCandidate(pfc,pfbe).ecalEnergy());
       }
     if(pfbe.type()==reco::PFBlockElement::TRACK)
       {
@@ -712,7 +752,7 @@ void PFCandidateAnalyzer::addElectron( const reco::PFCandidate & pfc) const {
     myElectron.setGsfOutMean(myTrackRef->outerMomentum());
     myElectron.setGsfNhits(myTrackRef->hitPattern().trackerLayersWithMeasurement());
     myElectron.setGsfChi2(myTrackRef->normalizedChi2());
-    
+    myElectron.setDCA( myTrackRef->d0 (),myTrackRef->d0Error());
   }
   myElectron.setGsfInMode(math::XYZVector(myTrackRef->pxMode(),
 					  myTrackRef->pyMode(),
@@ -754,8 +794,60 @@ void PFCandidateAnalyzer::addElectron( const reco::PFCandidate & pfc) const {
   }
   
   tElectrons_->push_back(myElectron);
-  if(fillElectronsIsoDep_) setIsoDeposits((PF::Particle&)tElectrons_->back(), pfc);
+  if(fillElectronsIsoDep_) setIsoDeposits(tElectrons_->back(), &pfc);
 
+}
+
+void PFCandidateAnalyzer::addNeutralHadron( const reco::PFCandidate & pfc) const {
+  tNeutralHadrons_->push_back( Particle( PF::LorentzVector( pfc.p4() ) , 
+					 pfc.particleId() ) );
+}
+
+void PFCandidateAnalyzer::addMuon( const reco::PFCandidate & pfc) const {
+  tMuons_->push_back(Muon( PF::LorentzVector( pfc.p4() ), 
+			   pfc.rawEcalEnergy(), 
+			   pfc.rawHcalEnergy(),
+			   pfc.particleId() ) );
+  
+  tMuons_->back().setPosEcal( math::XYZPoint( pfc.positionAtECALEntrance().x(),
+					      pfc.positionAtECALEntrance().y(),
+					      pfc.positionAtECALEntrance().z()) ); 
+
+  
+  setMuonInfo( tMuons_->back(), pfc);
+  if(fillMuonsIsoDep_) {
+    setIsoDeposits( tMuons_->back(), &pfc);
+  }
+}
+
+void PFCandidateAnalyzer::addHF( const reco::PFCandidate & pfc) const {
+  tHFs_->push_back( Particle( PF::LorentzVector(pfc.p4()), 
+			      pfc.particleId() ) );
+}
+
+void  PFCandidateAnalyzer::addRandomCones(const unsigned int& numOfSeeds, const double& etaMax) const {
+
+  unsigned int seeds = 0;
+  if(useMuonDirForRandom_){
+    seeds = (unsigned int) muons_->size() ;
+  }else{
+    seeds = numOfSeeds;
+  }
+
+  for(unsigned int it = 0; it < seeds ; it++){
+    
+    if(useMuonDirForRandom_){
+      const edm::Ptr<reco::Candidate> Ptr(muons_,it);
+      tRandomCones_->push_back( RandomCone( PF::LorentzVector(Ptr->p4()) ) );
+    }else{
+      double phi = tRandom_->Uniform(-TMath::Pi(),TMath::Pi());
+      double eta = tRandom_->Uniform(-etaMax,etaMax);
+      math::PtEtaPhiMLorentzVector lv(1.,eta,phi,0.);
+      tRandomCones_->push_back( RandomCone( lv)  );
+    } 
+
+    setIsoDeposits( tRandomCones_->back(), 0);
+  }
 }
 
 
@@ -882,11 +974,14 @@ void  PFCandidateAnalyzer::addBranch(TTree *tree){
   tree->Branch("LumiSection",&lumisection_);
 
   tree->Branch("ChargedHadrons","std::vector< PF::ChargedHadron >", &tChargedHadrons_);
+  tree->Branch("CleanedChannels","std::vector< PF::CleanedChannel >", &tCleanedChannels_);
   tree->Branch("Photons","std::vector< PF::Photon >", &tPhotons_);
   tree->Branch("Muons","std::vector< PF::Muon >", &tMuons_);
-  tree->Branch("Electron","std::vector< PF::Electron >", &tElectrons_);
-
-
+  tree->Branch("Electrons","std::vector< PF::Electron >", &tElectrons_);
+  tree->Branch("NeutralHadrons","std::vector< PF::Particle >", &tNeutralHadrons_);
+  tree->Branch("RandomCones","std::vector< PF::RandomCone >", &tRandomCones_);
+  tree->Branch("HFs","std::vector< PF::Particle >", &tHFs_);
+  tree->Branch("Trigger","PF::TriggerInformation", &tTriggerInformation_);
 }
 
 
@@ -899,9 +994,14 @@ void  PFCandidateAnalyzer::addCutHistos(TList *aList){
 void PFCandidateAnalyzer::clear(){
 
   tChargedHadrons_->clear();
+  tCleanedChannels_->clear();
+  tNeutralHadrons_->clear();
   tPhotons_->clear();
   tMuons_->clear();
   tElectrons_->clear();
+  tRandomCones_->clear();
+  tHFs_->clear();
+  tTriggerInformation_->clear();
 }
 
 const reco::PFRecTrack * PFCandidateAnalyzer::findPFRecTrack(const reco::TrackRef& ref) const
@@ -917,9 +1017,43 @@ const reco::PFRecTrack * PFCandidateAnalyzer::findPFRecTrack(const reco::TrackRe
   return 0;
 }
 
-void PFCandidateAnalyzer::setIsoDeposits(PF::Particle& particle, const reco::PFCandidate& pfCandidate) const{
-  std::cout << "test" <<std::endl;
-  reco::isodeposit::Direction pfDir(pfCandidate.eta(), pfCandidate.phi());
+
+void PFCandidateAnalyzer::setTriggerInformation()  {
+  tTriggerInformation_ ->setBSC( simulatedBSCTrigger(0) ); 
+} 
+
+
+bool PFCandidateAnalyzer::simulatedBSCTrigger( float eThresh ) const {
+
+  bool minhf = false;
+  bool maxhf = false; 
+  for( unsigned i=0; i<tHFs_->size(); ++i) {
+    if( minhf && maxhf ) break;
+    const Particle& part = (*tHFs_)[i];
+     
+    assert( part.type() == PFCandidate::h_HF ||
+	    part.type() == PFCandidate::egamma_HF ); 
+
+    if( !minhf && 
+	part.energy() > eThresh && 
+	part.eta()<0 )
+      minhf = true; 
+    if( !maxhf && 
+	part.energy() > eThresh && 
+	part.eta() > 0)
+      maxhf = true; 
+
+  }
+
+  return minhf && maxhf; 
+
+}
+
+
+void PFCandidateAnalyzer::setIsoDeposits( PF::Particle& particle, 
+					  const reco::PFCandidate* pfCandidate) const{
+
+  reco::isodeposit::Direction pfDir(particle.Eta(), particle.Phi());
   reco::IsoDeposit::Veto veto;
   veto.vetoDir = pfDir;
   veto.dR = 0.05; 
@@ -932,21 +1066,51 @@ void PFCandidateAnalyzer::setIsoDeposits(PF::Particle& particle, const reco::PFC
     deps.push_back(dep);
   }
 
+  IsoDeposit photonIsoDep(pfDir);
+  IsoDeposit chIsoDep(pfDir);
+  IsoDeposit nhIsoDep(pfDir);
+  
   for(reco::PFCandidateCollection::const_iterator ci  = pfCandidates_->begin(); ci!=pfCandidates_->end(); ++ci) {  
     const reco::PFCandidate& pfc = *ci;
-    if( &pfCandidate == &pfc) continue; 
+    if( pfCandidate == &pfc) continue; 
     LorentzVector pvi(pfc.p4());
     reco::isodeposit::Direction dirPfc(pfc.eta(), pfc.phi());
     double dR = pfDir.deltaR(dirPfc);
     if(dR > maxDeltaRForIsoDep_) continue;
-    double et = pvi.Et();
-    deps[0].addDeposit(dirPfc, et); //all
-    if( pfc.particleId() == 1) deps[1].addDeposit(dirPfc, et); //charged
-    if( pfc.particleId() == 5) deps[2].addDeposit(dirPfc, et); //neutral
-    if( pfc.particleId() == 4) deps[3].addDeposit(dirPfc, et); //gamma
+    double pt = pvi.Pt();
+    if( pfc.particleId() == 1) chIsoDep.addDeposit(dirPfc, pt); //charged
+    if( pfc.particleId() == 5) nhIsoDep.addDeposit(dirPfc, pt); //neutral
+    if( pfc.particleId() == 4) photonIsoDep.addDeposit(dirPfc, pt); //gamma
   }
 
-  particle.setIsoDeposit(deps);
- 
+  particle.setIsoDeposit( PfChargedHadronIso, chIsoDep);
+  particle.setIsoDeposit( PfNeutralHadronIso, nhIsoDep);
+  particle.setIsoDeposit( PfGammaIso, photonIsoDep);
+
 }
        
+// Used by the electrons to find the PFCandidate (electron/photon) corresponding to the PFBlockElement.
+const reco::PFCandidate & PFCandidateAnalyzer::correspondingDaughterCandidate(const reco::PFCandidate & cand, const reco::PFBlockElement & pfbe) const
+{
+  unsigned refindex=pfbe.index();
+  //  std::cout << " N daughters " << cand.numberOfDaughters() << std::endl;
+  reco::PFCandidate::const_iterator myDaughterCandidate=cand.begin();
+  reco::PFCandidate::const_iterator itend=cand.end();
+
+  for(;myDaughterCandidate!=itend;++myDaughterCandidate)
+    {
+      const reco::PFCandidate * myPFCandidate = (const reco::PFCandidate*)&*myDaughterCandidate;
+      if(myPFCandidate->elementsInBlocks().size()!=1)
+	{
+	  //  std::cout << " Daughter with " << myPFCandidate.elementsInBlocks().size()<< " element in block " << std::endl;
+	  return cand;
+	}
+      if(myPFCandidate->elementsInBlocks()[0].second==refindex) 
+	{
+	  //  std::cout << " Found it " << cand << std::endl;
+	  return *myPFCandidate;
+	}      
+    }
+  return cand;
+}
+
