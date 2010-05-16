@@ -1,0 +1,12 @@
+<bin name=RPCHDQMInspector file=RPCHDQMInspector.cc>
+  <use name=FWCore/Framework>
+  <use name=CondCore/DBCommon>
+  <lib name=DQMServicesDiagnostic>
+  <lib name=DQMRPCHistoricInfoClient>
+</bin>
+
+
+
+
+
+
