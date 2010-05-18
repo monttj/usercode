@@ -192,12 +192,12 @@ RPCDetIdStringAssociation::RPCDetIdStringAssociation(){
   this->fillKeyRawId(1000,"RPC");
 
 
-  this->fillKeyString("EndcapNegative",1);
-  this->fillKeyRawId(1,"EndcapNegative");
+  this->fillKeyString("for_EndcapNegative",1);
+  this->fillKeyRawId(1,"for_EndcapNegative");
   this->fillKeyString("Barrel",2);
   this->fillKeyRawId(2,"Barrel");
-  this->fillKeyString("EndcapPositive",3);
-  this->fillKeyRawId(3,"EndcapPositive");
+  this->fillKeyString("for_EndcapPositive",3);
+  this->fillKeyRawId(3,"for_EndcapPositive");
 
   //Barrel
   for(int i=-2; i <= 2; i++){
