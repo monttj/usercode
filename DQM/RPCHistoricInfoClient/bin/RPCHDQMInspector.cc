@@ -71,6 +71,14 @@ void runRPCInspector( const string & dbName, const string &tagName, const string
   label<<"RPC";
   vstring.push_back(label.str());
 
+  label.str("");
+  label<<"for_EndcapNegative";
+  vstring.push_back(label.str());
+  
+  label.str("");
+  label<<"for_EndcapPositive";
+  vstring.push_back(label.str());
+
 
   //Loop on all labels and fill cinfig vector
   for(vector<string>::iterator it = vstring.begin(); it != vstring.end(); ++it ){
@@ -93,9 +101,18 @@ void runRPCInspector( const string & dbName, const string &tagName, const string
 	string nameFedFatal = "FEDFatal.gif";
 	config.push_back(Trend( fedFatal.c_str(), nameFedFatal.c_str(), 0, condition, "", Start, End, nRuns ));
 	
+      }else if((itmap->first).find("for_EndcapNegative") != string::npos ||
+               (itmap->first).find("for_EndcapPositive") != string::npos){
+        stringstream out;
+        out << itmap->second;
+        
+        string clsmean = string(out.str())+"@ClusterSize_@mean";
+        string nameclsmean = "ClusterSize_"+string(itmap->first)+".gif";
+
+        config.push_back(Trend( clsmean.c_str(), nameclsmean.c_str(), 0, condition, "", Start, End, nRuns ));
+
       }else if((itmap->first).find("near") == string::npos && 
 	      (itmap->first).find("far") == string::npos){
-	
 	stringstream out;
 	out << itmap->second;
 	
@@ -105,12 +122,42 @@ void runRPCInspector( const string & dbName, const string &tagName, const string
 	string clsmean = string(out.str())+"@ClusterSize_@mean";
 	string nameclsmean = "ClusterSize_"+string(itmap->first)+".gif";
 
+        string digimean = string(out.str())+"@NumberOfDigi_Mean_Distribution_@mean";
+        string namedigimean = "NumberOfDigi_Mean_Distribution_"+string(itmap->first)+".gif";
+
+        string good = string(out.str())+"@RPCChamberQuality_Distribution_@good";
+        string namegood = "RPCChamberQuality_Good_"+string(itmap->first)+".gif";
+
+        string off = string(out.str())+"@RPCChamberQuality_Distribution_@off";
+        string nameoff = "RPCChamberQuality_Off_"+string(itmap->first)+".gif";
+
         string noiseCh = string(out.str())+"@RPCChamberQuality_Distribution_@noiseCh";
         string namenoiseCh = "RPCChamberQuality_Noise_Chamber_"+string(itmap->first)+".gif";
 
+        string noiseSt = string(out.str())+"@RPCChamberQuality_Distribution_@noiseSt";
+        string namenoiseSt = "RPCChamberQuality_Noise_Strip_"+string(itmap->first)+".gif";
+
+        string partDead = string(out.str())+"@RPCChamberQuality_Distribution_@partDead";
+        string namepartDead = "RPCChamberQuality_Partly_Dead"+string(itmap->first)+".gif";
+
+        string dead = string(out.str())+"@RPCChamberQuality_Distribution_@dead";
+        string namedead = "RPCChamberQuality_Dead"+string(itmap->first)+".gif";
+
+        string badShape = string(out.str())+"@RPCChamberQuality_Distribution_@badShape";
+        string namebadShape = "RPCChamberQuality_Bad_Shape"+string(itmap->first)+".gif";
+
+
         config.push_back(Trend( bxmean.c_str(), namebxmean.c_str(), 0, condition, "", Start, End, nRuns ));
         config.push_back(Trend( clsmean.c_str(), nameclsmean.c_str(), 0, condition, "", Start, End, nRuns ));
+        config.push_back(Trend( digimean.c_str(), namedigimean.c_str(), 0, condition, "", Start, End, nRuns ));
+        config.push_back(Trend( good.c_str(), namegood.c_str(), 0, condition, "", Start, End, nRuns ));
+        config.push_back(Trend( off.c_str(), nameoff.c_str(), 0, condition, "", Start, End, nRuns ));
         config.push_back(Trend( noiseCh.c_str(), namenoiseCh.c_str(), 0, condition, "", Start, End, nRuns ));
+        config.push_back(Trend( noiseSt.c_str(), namenoiseSt.c_str(), 0, condition, "", Start, End, nRuns ));
+        config.push_back(Trend( partDead.c_str(), namepartDead.c_str(), 0, condition, "", Start, End, nRuns ));
+        config.push_back(Trend( dead.c_str(), namedead.c_str(), 0, condition, "", Start, End, nRuns ));
+        config.push_back(Trend( badShape.c_str(), namebadShape.c_str(), 0, condition, "", Start, End, nRuns ));
+
       }else{
 	stringstream out;
 	out << itmap->second;
