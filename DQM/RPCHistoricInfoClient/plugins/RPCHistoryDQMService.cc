@@ -28,6 +28,16 @@ uint32_t RPCHistoryDQMService::returnDetComponent(const MonitorElement* ME){
   if ( str.find("RPCChamberQuality_Distribution_Disk")!=string::npos ){
     str.replace(str.find("RPCChamberQuality_Distribution_Disk"), 35, "RPCChamberQuality_Distribution_Disk_");
   } 
+  if ( str.find("NumberOfDigi_Mean_Distribution_Wheel")!=string::npos){
+    str.replace(str.find("NumberOfDigi_Mean_Distribution_Wheel"), 36, "NumberOfDigi_Distribution_Wheel_");
+  }
+  if ( str.find("NumberOfDigi_Mean_Distribution_Disk")!=string::npos ){
+    str.replace(str.find("NumberOfDigi_Mean_Distribution_Disk"), 35, "NumberOfDigi_Distribution_Disk_");
+  }
+  if ( str.find("EffDistroDisk_m")!=string::npos ){
+    str.replace(str.find("EffDistroDisk_m"), 15, "EffDistroDisk_-");
+  }
+
   //cout << "modified ME= " << str << endl;
 
   vector<string> vstring;
@@ -62,23 +72,7 @@ uint32_t RPCHistoryDQMService::returnDetComponent(const MonitorElement* ME){
 
   cout<<"Global name:  "<< globname << endl;
 
-//   const map<string, int> &  prova =_strAss->getKeyString();
-//   cout<< "Ho chiamato mappa" << &prova<< endl;
-//   for(map<string,int>::const_iterator it = prova.begin(); it != prova.end(); ++it)
-//     cout<< it->first<< "  "<< it->second<< endl;
   return _strAss->getKeyStringValue(globname);
-//   if ((str.find("BxDistribution_")!= string::npos 
-//        || str.find("ClusterSize_")!= string::npos)){
-//     cout<<" Global PLots------"<<endl;
-//     return _strAss->getKeyStringValue(globname); 
-//   }
-//   else if ((str.find("BXN_")!= string::npos || 
-// 	    str.find("ClusterSize_")!= string::npos ||
-// 	    str.find("Profile_")!= string::npos)){
-        
-
-//     return _strAss->getKeyStringValue(globname);
-//   }
 }
 
 //Example on how to define an user function for the statistic extraction
