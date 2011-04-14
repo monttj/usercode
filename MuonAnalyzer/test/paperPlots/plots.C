@@ -119,7 +119,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      grae1LKTmc->Draw("PSame");
      clearXErrorBar(grae1LKTdata);
      clearXErrorBar(grae1LKTmc);
-     SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT Data", "PL","PL","P","P");
+     SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
    }
   
    //PT draw
@@ -172,7 +172,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
        grae1LKTsf->Draw("PSame");
        SetLegend(grae1sf, grae2sf, grae1LKTsf, head, leg1, leg2, leg3, "PL", "PL", "P");
      }
-
+     c_sf->Print(Form("%sSF.eps",type.Data()));
    }
 
    if ( type.Contains("cEffPFBaseISO") || type.Contains("cEffDETBaseISO") ){
@@ -315,8 +315,8 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
 void plots(){
    //Efficiency for pf
    draw("cEffPFBaseISO", "Isolation Efficiency", "Isolation Threshold", "PF iso",  0.85, 1.01, "T&P Data", "T&P MC");
-   draw("cEffDETBaseISOrel", "Isolation Efficiency", "Isolation Threshold", "Det iso (trk+calo)", 0.85, 1.01, "T&P Data", "T&P MC"); 
-   draw("cEffDETBaseISOtrk", "Isolation Efficiency", "Isolation Threshold", "Det iso (trk-only)", 0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cEffDETBaseISOrelLKT", "Isolation Efficiency", "Isolation Threshold", "Det iso (trk+calo)", 0.85, 1.01, "T&P Data", "T&P MC"); 
+   draw("cEffDETBaseISOtrkLKT", "Isolation Efficiency", "Isolation Threshold", "Det iso (trk-only)", 0.85, 1.01, "T&P Data", "T&P MC");
 
    //Efficiency for LKT : caution! it is different style
    //drawLKT("cEffLKTrel", "Isolation Efficiency", "RelIso", "LKT", "Data", "MC");
