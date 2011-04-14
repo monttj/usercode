@@ -143,6 +143,60 @@ TGraphErrors * getROC(TGraphErrors * sig, TGraphErrors *bkg){
   return gr;
 }
 
+TGraphErrors * getSF(TGraphErrors * sig, TGraphErrors *bkg){
+  TGraphErrors * gr =  new TGraphErrors();
+  int npoint = sig->GetN();
+   
+  for(int i = 0; i < npoint ; i++){
+    double sigx;
+    double sigy;
+    double bkgx;
+    double bkgy;
+    double sf = 0 ;
+    if( bkgy != 0 ) sf = sigy/bkgy;
+    sig->GetPoint(i,sigx, sigy);
+    bkg->GetPoint(i,bkgx, bkgy);
+    gr->SetPoint(i,sigx,sf);
+  }
+   
+  return gr;
+}
+
+TGraphAsymmErrors * getSF(TGraphAsymmErrors * sig, TGraphAsymmErrors *bkg){
+  TGraphAsymmErrors * gr =  new TGraphAsymmErrors();
+  int npoint = sig->GetN();
+
+  for(int i = 0; i < npoint ; i++){
+    double bkgx;
+    double bkgy;
+    double sigx;
+    double sigy;
+    double sigxhigh = sig->GetErrorXhigh(i);
+    double sigxlow = sig->GetErrorXlow(i);
+    double sigyhigh = sig->GetErrorYhigh(i);
+    double sigylow = sig->GetErrorYlow(i);
+    sig->GetPoint(i,sigx,sigy);
+    bkg->GetPoint(i,bkgx, bkgy);
+
+    double sf = 0;
+    double sferrhigh = 0;
+    double sferrlow = 0;
+    if( bkgy !=0 ) {
+      sf = sigy/bkgy;
+      sferrhigh = sigyhigh/bkgy; 
+      sferrlow =  sigylow/bkgy;
+    }
+    gr->SetPoint(i,sigx,sf);
+    gr->SetPointEXhigh(i, sigxhigh);
+    gr->SetPointEXlow(i,  sigxlow);
+    gr->SetPointEYhigh(i, sigyhigh);
+    gr->SetPointEYlow(i,  sigylow);
+
+  }
+
+  return gr;
+}
+
 void clearXErrorBar(TGraphErrors * gr)
 {
    for (Int_t i=0; i< gr->GetN(); ++i) {
