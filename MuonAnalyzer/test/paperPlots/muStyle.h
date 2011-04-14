@@ -42,7 +42,7 @@ void SetStyleGraphErrors(TGraphErrors *grae, int color, int mstyle, int lstyle, 
    grae->GetYaxis()->SetLabelOffset(0.007);
    grae->GetYaxis()->SetLabelSize(0.05);
    grae->GetYaxis()->SetTitleSize(0.06);
-   grae->GetYaxis()->SetTitleOffset(1.3);
+   grae->GetYaxis()->SetTitleOffset(1.25);
    grae->GetYaxis()->SetTitleFont(42);
  
 }
@@ -72,7 +72,7 @@ void SetStyleGraphErrors(TGraphAsymmErrors *grae, int color, int mstyle, int lst
    grae->GetYaxis()->SetLabelOffset(0.007);
    grae->GetYaxis()->SetLabelSize(0.05);
    grae->GetYaxis()->SetTitleSize(0.06);
-   grae->GetYaxis()->SetTitleOffset(1.3);
+   grae->GetYaxis()->SetTitleOffset(1.25);
    grae->GetYaxis()->SetTitleFont(42);
 
 }
@@ -192,6 +192,15 @@ TGraphAsymmErrors * getSF(TGraphAsymmErrors * sig, TGraphAsymmErrors *bkg){
     gr->SetPointEYhigh(i, sigyhigh);
     gr->SetPointEYlow(i,  sigylow);
 
+  }
+
+  return gr;
+}
+
+TGraphAsymmErrors * getTemp(int min, int max){
+  TGraphAsymmErrors * gr =  new TGraphAsymmErrors();
+  for(int i = min; i < max ; i++){
+    gr->SetPoint(i,i*0.01,0);
   }
 
   return gr;
