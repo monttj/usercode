@@ -185,7 +185,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
 
      if( type.Contains("cEffPFBaseISO") ){
        grae1sf->Draw("AP");
-       SetLegend(grae1sf, head, leg1,  "PL");
+       SetLegend(grae1sf, head, "T&P",  "PL");
      }else if( type.Contains("cEffDETBaseISO") ){
        grae1sf->Draw("APSame");
        grae1LKTsf->Draw("PSame");
