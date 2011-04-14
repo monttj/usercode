@@ -14,6 +14,7 @@
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsEta.h"
 #include "LKT_PLOTS/c_ROC_LKT_RelComb_DATAblack_MCWITHPUred.h"
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsNCaloTowers.h"
+#include "LKT_PLOTS/efficienciesData.h"
 
 void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  double min, double max, TString &leg1, TString& leg2, TString &leg3 = ""){
    TCanvas *c = new TCanvas(Form("%s",type.Data()), Form("%s",type.Data()) ,5,49,400,400);
@@ -64,6 +65,23 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      SetEffLKTTrkPt(grae1LKTmc, grae1LKTdata);
    }
 
+   if( type.Contains("cROCPFBaseIso")){
+     ROCParticleIsoData(grae1data);
+     ROCParticleIsoMC(grae1mc);
+   }else if ( type.Contains("cROCDETBaseIsorel")){
+     ROCDetectorRelIsoData(grae1data);
+     ROCDetectorRelIsoMC(grae1mc);
+     ROCLKTIsoData(grae1LKTdata);
+     TGraphErrors *graeTbkg = new TGraphErrors();
+     TGraphErrors *graeTsig = new TGraphErrors();
+     EffLKTIsoMC(graeTsig);
+     SetDataQCDEffLKT(graeTbkg);
+     grae1LKTmc = getROC(graeTsig, graeTbkg);
+   }else if ( type.Contains("cROCDETBaseIsotrk")){
+     ROCDetectorTrkIsoData(grae1data);
+     ROCDetectorTrkIsoMC(grae1mc);
+   }
+
    SetStyleGraphErrors(grae1data, datacolor1, 20, 0, 0.0, ytitle, xtitle, min, max);
    SetStyleGraphErrors(grae2data, datacolor2, 20, 0, 0.0, ytitle, xtitle, min, max);
    SetStyleGraphErrors(grae1mc, 2, 21, 0, 0.0, ytitle, xtitle, min, max);
@@ -77,8 +95,8 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
    }else if ( type.Contains("cEffDETBaseIso") ) {
      grae1data->Draw("APC");
      grae1mc->Draw("PCSame");
-     grae1LKTdata->Draw("P");
-     grae1LKTmc->Draw("P");
+     grae1LKTdata->Draw("PSame");
+     grae1LKTmc->Draw("PSame");
      clearXErrorBar(grae1LKTdata);
      clearXErrorBar(grae1LKTmc);
      SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT Data", "PL","PL","P","P");
@@ -89,12 +107,25 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      grae2data->Draw("PSame");
      SetLegend(grae1data, grae2data, head, leg1, leg2, "PL", "PL");
    }else if( type.Contains("cEffDETBasePT") ){
-     grae1data->Draw("AP");
+     grae1data->Draw("APSame");
      grae2data->Draw("PSame");
-     grae1LKTdata->Draw("P");
+     grae1LKTdata->Draw("PSame");
      SetLegend(grae1data, grae2data, grae1LKTdata, head, leg1, leg2, leg3, "PL", "PL", "P");
    }
 
+   if( type.Contains("cROCPFBaseIso") || type.Contains("cROCDETBaseIsotrk") ){
+     grae1data->Draw("APC");
+     grae1mc->Draw("PCSame");
+     SetLegend(grae1data, grae1mc, head, leg1, leg2, "PL", "PL");
+   }else if ( type.Contains("cROCDETBaseIsorel") ) {
+     grae1data->Draw("APC");
+     grae1mc->Draw("PCSame");
+     grae1LKTdata->Draw("PSame");
+     grae1LKTmc->Draw("PSame");
+     clearXErrorBar(grae1LKTdata);
+     clearXErrorBar(grae1LKTmc);
+     SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
+   }
 
    c->Print(Form("%s.eps",type.Data()));
 }
@@ -181,48 +212,6 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    c->Print(Form("%s.eps",type.Data()));
 }
 
-void draw(TString& type, TString& ytitle, TString& xtitle, TString& head, TString &leg1, TString& leg2, TString& leg3){
-   TCanvas *c = new TCanvas(Form("%s",type.Data()), Form("%s",type.Data()) ,5,49,400,400);
-   SetStyleCanvas(c);
-
-   TGraphAsymmErrors *grae1data = new TGraphAsymmErrors();
-   TGraphAsymmErrors *grae2data = new TGraphAsymmErrors();
-   TGraphAsymmErrors *grae3data = new TGraphAsymmErrors();
-   TGraphAsymmErrors *grae1mc = new TGraphAsymmErrors();
-   TGraphAsymmErrors *grae2mc = new TGraphAsymmErrors();
-   TGraphAsymmErrors *grae3mc = new TGraphAsymmErrors();
-
-   if( type.Contains("cEffPFBasePT") ){
-     SetEffPFPt(grae1data, grae1mc);
-     SetEffPFPt2(grae2data, grae2mc);
-     SetEffPFPt3(grae3data, grae3mc);
-   }else if( type.Contains("cEffDETBasePT") ){
-     SetEffDetPt(grae1data, grae1mc);
-     SetEffDetPt2(grae2data, grae2mc);
-     SetEffDetPt3(grae3data, grae3mc);
-   }
-
-   SetStyleGraphErrors(grae1data, 2, 20, 2, 1.1, ytitle, xtitle, 0.5, 1.02);
-   SetStyleGraphErrors(grae2data, 3, 22, 2, 1.1, ytitle, xtitle, 0.5, 1.02);
-   SetStyleGraphErrors(grae3data, 4, 23, 2, 1.1, ytitle, xtitle, 0.5, 1.02);
-
-   SetStyleGraphErrors(grae1mc, 2, 20, 1, 1.1, ytitle, xtitle, 0.5, 1.02);
-   SetStyleGraphErrors(grae2mc, 3, 22, 1, 1.1, ytitle, xtitle, 0.5, 1.02);
-   SetStyleGraphErrors(grae3mc, 4, 23, 1, 1.1, ytitle, xtitle, 0.5, 1.02);
-
-   grae1data->Draw("AP");
-   grae2data->Draw("PSame");
-   grae3data->Draw("PSame");
-   grae1mc->Draw("PSame");
-   grae2mc->Draw("PSame");
-   grae3mc->Draw("PSame");
-
-   SetLegend(grae1data, grae2data, grae3data, head, leg1, leg2, leg3, "PL","PL","PL","P");
-   c->Print(Form("%s.eps",type.Data()));
-}
-
-
-
 void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TString &leg1, TString& leg2, TString& leg3, TString & leg4){
   TCanvas *c = new TCanvas(Form("%s",type.Data()), Form("%s",type.Data()) ,5,49,400,400);
   SetStyleCanvas(c);
@@ -273,5 +262,8 @@ void plots(){
 
    //ROC for data all
    drawROC("cROCallData","Signal Efficiency","Enhanced QCD Efficiency", "Data", "pflow (T&P)", "trk+calo (T&P)", "trk-only (T&P)", "trk+calo (LKT)");
+   draw("cROCPFBaseIso", "Signal Efficiency", "Enhanced QCD Efficiency", "PF iso",  0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cROCDETBaseIsotrk", "Signal Efficiency", "Enhanced QCD Efficiency", "Det iso (trk-only)", 0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cROCDETBaseIsorel", "Signal Efficiency", "Enhanced QCD Efficiency", "Det iso (trk+calo)", 0.85, 1.01, "T&P Data", "T&P MC");
 
 }

@@ -126,6 +126,23 @@ void SetLegendBase(TLegend* leg) {
    leg->SetFillStyle(1001);
 }
 
+TGraphErrors * getROC(TGraphErrors * sig, TGraphErrors *bkg){
+  TGraphErrors * gr =  new TGraphErrors();
+  int npoint = sig->GetN();
+
+  for(int i = 0; i < npoint ; i++){
+    double sigx;
+    double sigy;
+    double bkgx;
+    double bkgy;
+    sig->GetPoint(i,sigx, sigy);
+    bkg->GetPoint(i,bkgx, bkgy);
+    gr->SetPoint(i,bkgy,sigy);  
+  }
+
+  return gr;
+}
+
 void clearXErrorBar(TGraphErrors * gr)
 {
    for (Int_t i=0; i< gr->GetN(); ++i) {
