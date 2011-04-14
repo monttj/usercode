@@ -77,7 +77,15 @@ void SetStyleGraphErrors(TGraphAsymmErrors *grae, int color, int mstyle, int lst
 
 }
 
-void SetLegend(TGraphErrors *grae1, TGraphErrors *grae2, TString & head, TString & leg1, TString & leg2) {
+void SetLegend(TGraph *grae1, TString & head, TString & leg1) {
+   TLegend *leg = new TLegend(0.6,0.3,0.9,0.45,NULL,"brNDC");
+   SetLegendBase(leg);
+   TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
+   leg->AddEntry(grae1,Form("%s",leg1.Data()),"PL");
+   leg->Draw();
+}
+
+void SetLegend(TGraph *grae1, TGraph *grae2, TString & head, TString & leg1, TString & leg2) {
    TLegend *leg = new TLegend(0.6,0.3,0.9,0.45,NULL,"brNDC");
    SetLegendBase(leg);
    TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
@@ -86,37 +94,7 @@ void SetLegend(TGraphErrors *grae1, TGraphErrors *grae2, TString & head, TString
    leg->Draw();
 }
 
-void SetLegend(TGraphAsymmErrors *grae1, TGraphAsymmErrors *grae2, TString & head, TString & leg1, TString & leg2) {
-   TLegend *leg = new TLegend(0.6,0.3,0.9,0.45,NULL,"brNDC");
-   SetLegendBase(leg);
-   TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
-   leg->AddEntry(grae1,Form("%s",leg1.Data()),"PL");
-   leg->AddEntry(grae2,Form("%s",leg2.Data()),"PL");
-   leg->Draw();
-}
-
-void SetLegend(TGraphErrors *grae1, TGraphErrors *grae2, TGraphErrors *grae3, TString & head, TString & leg1, TString & leg2, TString & leg3) {
-   TLegend *leg = new TLegend(0.6,0.3,0.9,0.45,NULL,"brNDC");
-   SetLegendBase(leg);
-   TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
-   leg->AddEntry(grae1,Form("%s",leg1.Data()),"PL");
-   leg->AddEntry(grae2,Form("%s",leg2.Data()),"PL");
-   leg->AddEntry(grae3,Form("%s",leg3.Data()),"PL");
-   leg->Draw();
-}
-
-void SetLegend(TGraphErrors *grae1, TGraphErrors *grae2, TGraphErrors *grae3, TGraphErrors *grae4, TString & head, TString & leg1, TString & leg2, TString & leg3, TString & leg4) {
-   TLegend *leg = new TLegend(0.6,0.65,0.9,0.90,NULL,"brNDC");
-   SetLegendBase(leg);
-   TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
-   leg->AddEntry(grae1,Form("%s",leg1.Data()),"PL");
-   leg->AddEntry(grae2,Form("%s",leg2.Data()),"PL");
-   leg->AddEntry(grae3,Form("%s",leg3.Data()),"PL");
-   leg->AddEntry(grae4,Form("%s",leg4.Data()),"PL");
-   leg->Draw();
-}
-
-void SetLegend(TGraphAsymmErrors *grae1, TGraphAsymmErrors *grae2, TGraphAsymmErrors *grae3, TString & head, TString & leg1, TString & leg2, TString & leg3) {
+void SetLegend(TGraph *grae1, TGraph *grae2, TGraph *grae3, TString & head, TString & leg1, TString & leg2, TString & leg3) {
    TLegend *leg = new TLegend(0.6,0.3,0.9,0.45,NULL,"brNDC");
    SetLegendBase(leg);
    TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
@@ -126,7 +104,7 @@ void SetLegend(TGraphAsymmErrors *grae1, TGraphAsymmErrors *grae2, TGraphAsymmEr
    leg->Draw();
 }
 
-void SetLegend(TGraphAsymmErrors *grae1, TGraphAsymmErrors *grae2, TGraphAsymmErrors *grae3, TGraphErrors *grae4, TString & head, TString & leg1, TString & leg2, TString & leg3, TString & leg4) {
+void SetLegend(TGraph *grae1, TGraph *grae2, TGraph *grae3, TGraph *grae4, TString & head, TString & leg1, TString & leg2, TString & leg3, TString & leg4) {
    TLegend *leg = new TLegend(0.6,0.3,0.9,0.45,NULL,"brNDC");
    SetLegendBase(leg);
    TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
@@ -148,4 +126,10 @@ void SetLegendBase(TLegend* leg) {
    leg->SetFillStyle(1001);
 }
 
+void clearXErrorBar(TGraphErrors * gr)
+{
+   for (Int_t i=0; i< gr->GetN(); ++i) {
+      gr->SetPointError(i,0,0);
+   }
+}
 
