@@ -1,5 +1,5 @@
 #include "muStyle.h"
-#include "ParticleBasedIso/c_ROCtnp_QCD_MC_pt20_50_PU.h"
+#include "ParticleBasedIso/c_ROCtnp_pt20_50_PU.h"
 #include "ParticleBasedIso/c_eff_QCD_MC_pt20_50_PU.h"
 #include "ParticleBasedIso/c_eff_pt_PFIso.h"
 #include "DetBaseIso/ROCtnp_RelComb_pt20_50.h"
@@ -15,6 +15,7 @@
 #include "LKT_PLOTS/c_ROC_LKT_RelComb_DATAblack_MCWITHPUred.h"
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsNCaloTowers.h"
 #include "LKT_PLOTS/efficienciesData.h"
+#include "LKT_PLOTS/efficienciesMCwithPU.h"
 
 void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  double min, double max, TString &leg1, TString& leg2, TString &leg3 = ""){
    TCanvas *c = new TCanvas(Form("%s",type.Data()), Form("%s",type.Data()) ,5,49,400,400);
@@ -94,7 +95,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      TGraphErrors *graeTbkg = new TGraphErrors();
      TGraphErrors *graeTsig = new TGraphErrors();
      EffLKTIsoMC(graeTsig);
-     SetDataQCDEffLKT(graeTbkg);
+     SetMCQCDEffLKT(graeTbkg);
      grae1LKTmc = getROC(graeTsig, graeTbkg);
    }else if ( type.Contains("cROCDETBaseIsotrk")){
      ROCDetectorTrkIsoData(grae1data);
@@ -246,7 +247,7 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    grae2->Draw("PSame");
    grae3->Draw("PSame");
 
-   SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3);
+   SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3, "PL","PL","PL");
    c->Print(Form("%s.eps",type.Data()));
 }
 
@@ -274,7 +275,7 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    grae3->Draw("PSame");
    grae4->Draw("PSame");
 
-   SetLegend(grae1, grae2, grae3, grae4, head, leg1, leg2, leg3, leg4);
+   SetLegend(grae1, grae2, grae3, grae4, head, leg1, leg2, leg3, leg4,"PL","PL","PL","PL", true);
    c->Print(Form("%s.eps",type.Data()));
 }
 
@@ -294,17 +295,26 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
 
   TGraphAsymmErrors *temp = new TGraphAsymmErrors();
   temp=getTemp(1, 17);
-  SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, 0.8, 1.02);
+  SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, 0.77, 1.02);
 
   SetStyleGraphErrors(grae1ROCdetrel, 2, 23, 0, 0.0,  ytitle, xtitle, 0.8, 1.02);
   SetStyleGraphErrors(grae1ROCdettrk, 3, 22, 0, 0.0, ytitle, xtitle, 0.8, 1.02);
   SetStyleGraphErrors(grae1ROCpf, 4, 20, 0, 0.0, ytitle, xtitle, 0.8, 1.02);
   SetStyleGraphErrors(grae1ROCLKT, 6, 20, 0, 1.1, ytitle, xtitle, 0.8, 1.02);
 
+  grae1ROCdetrel->SetFillColor(2);
+  grae1ROCdetrel->SetFillStyle(3001);
+
+  grae1ROCdettrk->SetFillColor(3);
+  grae1ROCdettrk->SetFillStyle(3001);
+
+  grae1ROCpf->SetFillColor(4);
+  grae1ROCpf->SetFillStyle(3001);
+
   temp->Draw("APC");
-  grae1ROCdetrel->Draw("PCSame");
-  grae1ROCdettrk->Draw("PCSame");
-  grae1ROCpf->Draw("PCSame");
+  grae1ROCdetrel->Draw("3CSame");
+  grae1ROCdettrk->Draw("3CSame");
+  grae1ROCpf->Draw("3CSame");
   grae1ROCLKT->Draw("PSame");
 
   SetLegend(grae1ROCpf, grae1ROCdetrel, grae1ROCdettrk, grae1ROCLKT, "Data", leg1, leg2, leg3, leg4, "PL","PL","PL","P");
@@ -323,8 +333,8 @@ void plots(){
    //drawLKT("cEffLKTtrk", "Isolation Efficiency", "RelIso", "LKT (track)", "Data", "MC");
    //drawLKT("cEffLKTPTrel", "Isolation Efficiency", "p_{T}", "LKT", "Data", "MC");
    //drawLKT("cEffLKTPTtrk", "Isolation Efficiency", "p_{T}", "LKT (track)", "Data", "MC");
-   //drawLKT("cEffLKTETA", "Isolation Efficiency", "#eta", "LKT", "MC (PU=0)", "Data (PU=0)", "MC (PU=10)");
-   //drawLKT("cEffLKTNCal", "Isolation Efficiency (PV=1)", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu", "Data", "t#bar{t} #rightarrow ll", "SUSY LM0");
+   //drawLKT("cEffLKTETA", "Isolation Efficiency", "#eta", "LKT, Z #rightarrow #mu#mu", "MC", "Data", "MC (PU=10)");
+   //drawLKT("cEffLKTNCal", "Isolation Efficiency", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu (MC)", "Z #rightarrow #mu#mu (Data)", "t#bar{t} #rightarrow ll (MC)", "SUSY (MC)");
 
    //Efficiency as a function of pT for PF
    draw("cEffPFBasePT", "Isolation Efficiency", "p_{T} (GeV/c)", "PF iso",  0.5, 1.05, "T&P (Th. 0.12)", "T&P (Th. 0.20)");
