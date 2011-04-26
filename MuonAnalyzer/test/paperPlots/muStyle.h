@@ -127,6 +127,32 @@ void SetLegendBase(TLegend* leg) {
    leg->SetFillStyle(1001);
 }
 
+TGraphAsymmErrors * getModifiedROC(TGraphAsymmErrors * sig, int npoint){
+
+  TGraphAsymmErrors * gr =  new TGraphAsymmErrors();
+
+  for(int i = 0; i < npoint ; i++){
+    double sigx;
+    double sigy;
+    sig->GetPoint(i,sigx,sigy);
+
+    double sigxhigh = sig->GetErrorXhigh(i);
+    double sigxlow = sig->GetErrorXlow(i);
+    double sigyhigh = sig->GetErrorYhigh(i);
+    double sigylow = sig->GetErrorYlow(i);
+
+    gr->SetPoint(i,sigx,sigy);
+    gr->SetPointEXhigh(i, sigxhigh);
+    gr->SetPointEXlow(i,  sigxlow);
+    gr->SetPointEYhigh(i, sigyhigh);
+    gr->SetPointEYlow(i,  sigylow);
+
+  }
+   
+  
+  return gr;
+}   
+
 TGraphErrors * getROC(TGraphErrors * sig, TGraphErrors *bkg){
   TGraphErrors * gr =  new TGraphErrors();
   int npoint = sig->GetN();

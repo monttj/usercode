@@ -292,7 +292,10 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
   ROCDetectorTrkIsoData(grae1ROCdettrk);
   ROCParticleIsoData(grae1ROCpf);
   ROCLKTIsoData(grae1ROCLKT);
-
+ 
+  //limit trk ROC to 10 points 
+  grae1ROCdettrk = getModifiedROC(grae1ROCdettrk, 10);
+ 
   TGraphAsymmErrors *temp = new TGraphAsymmErrors();
   temp=getTemp(1, 17);
   SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, 0.77, 1.02);
@@ -302,6 +305,7 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
   SetStyleGraphErrors(grae1ROCpf, 4, 20, 0, 0.0, ytitle, xtitle, 0.8, 1.02);
   SetStyleGraphErrors(grae1ROCLKT, 6, 20, 0, 1.1, ytitle, xtitle, 0.8, 1.02);
 
+  //draw error band *****
   grae1ROCdetrel->SetFillColor(2);
   grae1ROCdetrel->SetFillStyle(3001);
 
@@ -310,6 +314,7 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
 
   grae1ROCpf->SetFillColor(4);
   grae1ROCpf->SetFillStyle(3001);
+  //end draw error band *****
 
   temp->Draw("APC");
   grae1ROCdetrel->Draw("3CSame");
