@@ -94,8 +94,8 @@ void SetLegend(TGraph *grae1, TGraph *grae2, TString & head, TString & leg1, TSt
    leg->Draw();
 }
 
-void SetLegend(TGraph *grae1, TGraph *grae2, TGraph *grae3, TString & head, TString & leg1, TString & leg2, TString & leg3, TString st1, TString st2, TString st3) {
-   TLegend *leg = new TLegend(0.6,0.25,0.9,0.45,NULL,"brNDC");
+void SetLegend(TGraph *grae1, TGraph *grae2, TGraph *grae3, TString & head, TString & leg1, TString & leg2, TString & leg3, TString st1, TString st2, TString st3, double xl=0.6, double yl=0.25, double xh=0.9, double yh=0.45) {
+   TLegend *leg = new TLegend(xl,yl,xh,yh,NULL,"brNDC");
    SetLegendBase(leg);
    TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
    leg->AddEntry(grae1,Form("%s",leg1.Data()),Form("%s",st1.Data()));
@@ -104,9 +104,8 @@ void SetLegend(TGraph *grae1, TGraph *grae2, TGraph *grae3, TString & head, TStr
    leg->Draw();
 }
 
-void SetLegend(TGraph *grae1, TGraph *grae2, TGraph *grae3, TGraph *grae4, TString & head, TString & leg1, TString & leg2, TString & leg3, TString & leg4,TString st1, TString st2, TString st3, TString st4, bool move = false) {
-   TLegend *leg = new TLegend(0.6,0.25,0.9,0.45,NULL,"brNDC");
-   if(move) leg = new TLegend(0.6,0.68,0.9,0.88,NULL,"brNDC");
+void SetLegend(TGraph *grae1, TGraph *grae2, TGraph *grae3, TGraph *grae4, TString & head, TString & leg1, TString & leg2, TString & leg3, TString & leg4,TString st1, TString st2, TString st3, TString st4, double xl=0.6, double yl=0.25, double xh=0.9, double yh=0.45) {
+   TLegend *leg = new TLegend(xl,yl,xh,yh,NULL,"brNDC");
    SetLegendBase(leg);
    TLegendEntry *entry=leg->AddEntry("NULL",Form("%s",head.Data()),"h");
    leg->AddEntry(grae1,Form("%s",leg1.Data()),Form("%s",st1.Data()));

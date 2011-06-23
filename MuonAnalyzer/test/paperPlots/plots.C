@@ -2,8 +2,8 @@
 #include "ParticleBasedIso/c_ROCtnp_pt20_50_PU.h"
 #include "ParticleBasedIso/c_eff_QCD_MC_pt20_50_PU.h"
 #include "ParticleBasedIso/c_eff_pt_PFIso.h"
-#include "DetBaseIso/ROCtnp_RelComb_pt20_50.h"
-#include "DetBaseIso/ROCtnp_TrkRelISO_pt20_50.h"
+#include "DetBaseIso/ROCtnp_TrkCalo.h"
+#include "DetBaseIso/ROCtnp_TrkOnly.h"
 #include "DetBaseIso/Eff_RelComb_pt20_50.h"
 #include "DetBaseIso/Eff_TrkRelISO_pt20_50.h"
 #include "DetBaseIso/c_eff_pt_DetIso_Effs_PtBinned_NEW.h"
@@ -149,7 +149,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      clearXErrorBar(grae1LKTmc);
      SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
    }
-   SetLabel(0.19,0.88,36);
+   SetLabel(0.6,0.6,36);
    c->Print(Form("%s.eps",type.Data()));
 
    //SF for pt
@@ -226,6 +226,7 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    grae1->Draw("PSame");
    
    SetLegend(grae1, grae2, head, leg1, leg2);
+   SetLabel(0.6,0.6,36);
    c->Print(Form("%s.eps",type.Data()));
 }  
 
@@ -250,7 +251,8 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    grae2->Draw("PSame");
    grae3->Draw("PSame");
 
-   SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3, "PL","PL","PL");
+   SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3, "PL","PL","PL", 0.6,0.20,0.9,0.40);
+   SetLabel(0.6,0.48,36);
    c->Print(Form("%s.eps",type.Data()));
 }
 
@@ -278,7 +280,8 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    grae3->Draw("PSame");
    grae4->Draw("PSame");
 
-   SetLegend(grae1, grae2, grae3, grae4, head, leg1, leg2, leg3, leg4,"PL","PL","PL","PL", true);
+   SetLegend(grae1, grae2, grae3, grae4, head, leg1, leg2, leg3, leg4,"PL","PL","PL","PL", 0.6, 0.58, 0.9, 0.81);
+   SetLabel(0.6,0.88,36);
    c->Print(Form("%s.eps",type.Data()));
 }
 
@@ -342,8 +345,8 @@ void plots(){
    //drawLKT("cEffLKTtrk", "Isolation Efficiency", "RelIso", "LKT (track)", "Data", "MC");
    //drawLKT("cEffLKTPTrel", "Isolation Efficiency", "p_{T}", "LKT", "Data", "MC");
    //drawLKT("cEffLKTPTtrk", "Isolation Efficiency", "p_{T}", "LKT (track)", "Data", "MC");
-   //drawLKT("cEffLKTETA", "Isolation Efficiency", "#eta", "LKT, Z #rightarrow #mu#mu", "MC", "Data", "MC (PU=10)");
-   //drawLKT("cEffLKTNCal", "Isolation Efficiency", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu (MC)", "Z #rightarrow #mu#mu (Data)", "t#bar{t} #rightarrow ll (MC)", "SUSY (MC)");
+   drawLKT("cEffLKTETA", "Isolation Efficiency", "#eta", "LKT, Z #rightarrow #mu#mu", "MC", "Data", "MC (PU=10)");
+   drawLKT("cEffLKTNCal", "Isolation Efficiency", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu (MC)", "Z #rightarrow #mu#mu (Data)", "t#bar{t} #rightarrow ll (MC)", "SUSY (MC)");
 
    //Efficiency as a function of pT for PF
    draw("cEffPFBasePT", "Isolation Efficiency", "p_{T} (GeV/c)", "PF iso",  0.5, 1.1, "T&P (Th. 0.12)", "T&P (Th. 0.20)");
