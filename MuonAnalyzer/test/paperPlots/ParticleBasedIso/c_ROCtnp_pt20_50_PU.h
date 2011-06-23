@@ -47,7 +47,62 @@ void ROCParticleIsoData(TGraphAsymmErrors* grae){
    grae->SetPointError(22,0.0005662186,0.0005662186,0.000829405,0.000798615);
 }
 
+//updated
 void ROCParticleIsoMC(TGraphAsymmErrors* grae){
+   grae->SetPoint(0,0.007275627,0.826714);
+   grae->SetPointError(0,3.61532e-05,3.61532e-05,0.00254299,0.00252656);
+   grae->SetPoint(1,0.008390512,0.863899);
+   grae->SetPointError(1,4.02971e-05,4.02971e-05,0.00232026,0.00230198);
+   grae->SetPoint(2,0.00958788,0.891642);
+   grae->SetPointError(2,4.44743e-05,4.44743e-05,0.00212037,0.0021015);
+   grae->SetPoint(3,0.01093419,0.912179);
+   grae->SetPointError(3,4.88774e-05,4.88774e-05,0.00195301,0.00193345);
+   grae->SetPoint(4,0.01240156,0.92726);
+   grae->SetPointError(4,5.33531e-05,5.33531e-05,0.00181056,0.00179068);
+   grae->SetPoint(5,0.01401312,0.939888);
+   grae->SetPointError(5,5.79574e-05,5.79574e-05,0.00167946,0.00165896);
+   grae->SetPoint(6,0.01571384,0.949575);
+   grae->SetPointError(6,6.24523e-05,6.24523e-05,0.00156336,0.00154253);
+   grae->SetPoint(7,0.01760655,0.957247);
+   grae->SetPointError(7,6.71251e-05,6.71251e-05,0.00145732,0.00143612);
+   grae->SetPoint(8,0.0196663,0.963433);
+   grae->SetPointError(8,7.18608e-05,7.18608e-05,0.00136913,0.00134704);
+   grae->SetPoint(9,0.02187917,0.96829);
+   grae->SetPointError(9,7.6631e-05,7.6631e-05,0.00128949,0.00126695);
+   grae->SetPoint(10,0.0242932,0.972067);
+   grae->SetPointError(10,8.15105e-05,8.15105e-05,0.00121672,0.00119402);
+   grae->SetPoint(11,0.02683655,0.975656);
+   grae->SetPointError(11,8.6359e-05,8.6359e-05,0.00114106,0.00111806);
+   grae->SetPoint(12,0.02958975,0.978232);
+   grae->SetPointError(12,9.1292e-05,9.1292e-05,0.00108466,0.00106161);
+   grae->SetPoint(13,0.03254143,0.980566);
+   grae->SetPointError(13,9.62706e-05,9.62706e-05,0.00103773,0.00101443);
+   grae->SetPoint(14,0.03563204,0.982816);
+   grae->SetPointError(14,0.000101187,0.000101187,0.000987627,0.000963996);
+   grae->SetPoint(15,0.03905705,0.98441);
+   grae->SetPointError(15,0.000106351,0.000106351,0.000941384,0.000917851);
+   grae->SetPoint(16,0.04258442,0.98611);
+   grae->SetPointError(16,0.000111388,0.000111388,0.000890285,0.000866583);
+   grae->SetPoint(17,0.04632056,0.987227);
+   grae->SetPointError(17,0.000116452,0.000116452,0.000864135,0.000822346);
+   grae->SetPoint(18,0.05038986,0.988318);
+   grae->SetPointError(18,0.000121681,0.000121681,0.000827793,0.000787449);
+   grae->SetPoint(19,0.05467489,0.989096);
+   grae->SetPointError(19,0.000126916,0.000126916,0.000803059,0.000765191);
+   grae->SetPoint(20,0.05925583,0.989622);
+   grae->SetPointError(20,0.000132231,0.000132231,0.000775139,0.000740498);
+   grae->SetPoint(21,0.06398312,0.990075);
+   grae->SetPointError(21,0.000137449,0.000137449,0.000751779,0.000718504);
+   grae->SetPoint(22,0.06891275,0.9906);
+   grae->SetPointError(22,0.000142644,0.000142644,0.00073192,0.000699904);
+   grae->SetPoint(23,0.07404814,0.99125);
+   grae->SetPointError(23,0.000147808,0.000147808,0.000705286,0.000676655);
+   grae->SetPoint(24,0.07946512,0.991698);
+   grae->SetPointError(24,0.000153001,0.000153001,0.000688202,0.000661618);
+}
+
+//it is from mine
+void ROCParticleIsoMCOLD(TGraphAsymmErrors* grae){
    grae->SetPoint(0,0.008392435,0.86682);
    grae->SetPointError(0,1.897037e-05,1.897037e-05,0.00227779,0.00226439);
    grae->SetPoint(1,0.009508374,0.895122);

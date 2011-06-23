@@ -44,6 +44,52 @@ void ROCDetectorRelIsoData(TGraphAsymmErrors* grae){
 }
 
 void ROCDetectorRelIsoMC(TGraphAsymmErrors* grae){
+   grae->SetPoint(0,0.01509108,0.909462);
+   grae->SetPointError(0,6.11688e-05,6.11688e-05,0.00261114,0.00259334);
+   grae->SetPoint(1,0.01811268,0.933203);
+   grae->SetPointError(1,6.84888e-05,6.84888e-05,0.00231396,0.00229265);
+   grae->SetPoint(2,0.0214295,0.948026);
+   grae->SetPointError(2,7.57683e-05,7.57683e-05,0.00210002,0.00207148);
+   grae->SetPoint(3,0.02497339,0.960943);
+   grae->SetPointError(3,8.2854e-05,8.2854e-05,0.00186924,0.00183672);
+   grae->SetPoint(4,0.02879344,0.967682);
+   grae->SetPointError(4,8.98738e-05,8.98738e-05,0.00171435,0.00168013);
+   grae->SetPoint(5,0.03283475,0.974952);
+   grae->SetPointError(5,9.67117e-05,9.67117e-05,0.00155042,0.00151436);
+   grae->SetPoint(6,0.03700491,0.979435);
+   grae->SetPointError(6,0.000103243,0.000103243,0.0014379,0.00140078);
+   grae->SetPoint(7,0.04141335,0.98258);
+   grae->SetPointError(7,0.000109698,0.000109698,0.0013426,0.00130506);
+   grae->SetPoint(8,0.04616201,0.984879);
+   grae->SetPointError(8,0.00011619,0.00011619,0.00126426,0.00122552);
+   grae->SetPoint(9,0.05112296,0.986854);
+   grae->SetPointError(9,0.000122546,0.000122546,0.001174,0.00113459);
+   grae->SetPoint(10,0.05644037,0.988044);
+   grae->SetPointError(10,0.000128959,0.000128959,0.00111794,0.00107806);
+   grae->SetPoint(11,0.0618721,0.989934);
+   grae->SetPointError(11,0.000135129,0.000135129,0.00103185,0.000986876);
+   grae->SetPoint(12,0.06767859,0.991387);
+   grae->SetPointError(12,0.000141354,0.000141354,0.000961647,0.000916003);
+   grae->SetPoint(13,0.07363403,0.992163);
+   grae->SetPointError(13,0.000147388,0.000147388,0.000904722,0.000869097);
+   grae->SetPoint(14,0.07973082,0.993127);
+   grae->SetPointError(14,0.000153236,0.000153236,0.000857723,0.000821077);
+   grae->SetPoint(15,0.08610262,0.993474);
+   grae->SetPointError(15,0.000159039,0.000159039,0.000827115,0.000793578);
+   grae->SetPoint(16,0.09261806,0.993848);
+   grae->SetPointError(16,0.000164678,0.000164678,0.000804846,0.000769685);
+   grae->SetPoint(17,0.09940095,0.993982);
+   grae->SetPointError(17,0.000170267,0.000170267,0.000788728,0.000754055);
+   grae->SetPoint(18,0.1064498,0.994481);
+   grae->SetPointError(18,0.000175802,0.000175802,0.000756983,0.000722892);
+   grae->SetPoint(19,0.1135577,0.994846);
+   grae->SetPointError(19,0.000181126,0.000181126,0.000728098,0.000692969);
+   grae->SetPoint(20,0.120744,0.995253);
+   grae->SetPointError(20,0.000186269,0.000186269,0.000706546,0.000664739);
+}
+
+//following qcd efficiency is from enhanced data
+void ROCDetectorRelIsoMCOLD(TGraphAsymmErrors* grae){
    grae->SetPoint(0,0.02630826,0.909462);
    grae->SetPointError(0,0.0002729948,0.0002729948,0.00261114,0.00259334);
    grae->SetPoint(1,0.03062546,0.933203);
