@@ -1,0 +1,56 @@
+void SetEffDetPtRel10(TGraphAsymmErrors *grae, TGraphAsymmErrors *grae2){
+   grae->SetPoint(0,16.19402,0.8550079);
+   grae->SetPointError(0,6.194024,3.805976,0.01516155,0.01471739);
+   grae->SetPoint(1,37.66984,0.9710988);
+   grae->SetPointError(1,17.66984,12.33016,0.001427511,0.001396034);
+   grae->SetPoint(2,61.38315,0.9903164);
+   grae->SetPointError(2,11.38315,38.61685,0.00235444,0.00211884);
+   grae2->SetPoint(0,16.7092,0.8196481);
+   grae2->SetPointError(0,6.7092,3.2908,0.01502926,0.01440479);
+   grae2->SetPoint(1,38.06404,0.9676145);
+   grae2->SetPointError(1,18.06404,11.93596,0.001285173,0.001253128);
+   grae2->SetPoint(2,57.18151,0.993768);
+   grae2->SetPointError(2,7.181514,42.81849,0.001897602,0.001578145);
+}
+void SetEffDetPtRel15(TGraphAsymmErrors *grae, TGraphAsymmErrors *grae2){
+   grae->SetPoint(0,16.19402,0.9068654);
+   grae->SetPointError(0,6.194024,3.805976,0.01292569,0.01233659);
+   grae->SetPoint(1,37.66984,0.9854774);
+   grae->SetPointError(1,17.66984,12.33016,0.001031334,0.001010329);
+   grae->SetPoint(2,61.38315,0.9961104);
+   grae->SetPointError(2,11.38315,38.61685,0.001630782,0.001380242);
+   grae2->SetPoint(0,16.7092,0.8768328);
+   grae2->SetPointError(0,6.7092,3.2908,0.01295258,0.01221597);
+   grae2->SetPoint(1,38.06404,0.9824471);
+   grae2->SetPointError(1,18.06404,11.93596,0.0009581624,0.0009250948);
+   grae2->SetPoint(2,57.18151,0.9961649);
+   grae2->SetPointError(2,7.181514,42.81849,0.001533972,0.001210579);
+}
+void SetEffDetPtTrk10(TGraphAsymmErrors *grae, TGraphAsymmErrors *grae2){
+   grae->SetPoint(0,16.19402,0.9303761);
+   grae->SetPointError(0,6.194024,3.805976,0.01139732,0.01078307);
+   grae->SetPoint(1,37.66984,0.9857958);
+   grae->SetPointError(1,17.66984,12.33016,0.0009703961,0.0009314739);
+   grae->SetPoint(2,61.38315,0.9966202);
+   grae->SetPointError(2,11.38315,38.61685,0.0001584621,0.0001584621);
+   grae2->SetPoint(0,16.7092,0.9222874);
+   grae2->SetPointError(0,6.7092,3.2908,0.01067284,0.009846497);
+   grae2->SetPoint(1,38.06404,0.9893246);
+   grae2->SetPointError(1,18.06404,11.93596,0.0007538369,0.000720287);
+   grae2->SetPoint(2,57.18151,0.9985618);
+   grae2->SetPointError(2,7.181514,42.81849,0.001028804,0.0006934386);
+}
+void SetEffDetPtTrk05(TGraphAsymmErrors *grae, TGraphAsymmErrors *grae2){
+   grae->SetPoint(0,16.19402,0.8758438);
+   grae->SetPointError(0,6.194024,3.805976,0.01441188,0.01384717);
+   grae->SetPoint(1,37.66984,0.9533434);
+   grae->SetPointError(1,17.66984,12.33016,0.001671776,0.001651286);
+   grae->SetPoint(2,61.38315,0.9836831);
+   grae->SetPointError(2,11.38315,38.61685,0.002645227,0.002411844);
+   grae2->SetPoint(0,16.7092,0.8651026);
+   grae2->SetPointError(0,6.7092,3.2908,0.01343683,0.01272326);
+   grae2->SetPoint(1,38.06404,0.9602751);
+   grae2->SetPointError(1,18.06404,11.93596,0.001416007,0.001384467);
+   grae2->SetPoint(2,57.18151,0.9884947);
+   grae2->SetPointError(2,7.181514,42.81849,0.00250297,0.002188643);
+}
