@@ -240,3 +240,10 @@ void clearXErrorBar(TGraphErrors * gr)
    }
 }
 
+void SetLabel(double x, double y, double lumi){
+  TLatex *label= new TLatex;
+  label->SetNDC();
+  label->SetTextSize(0.04);
+  label->DrawLatex(x,y,"CMS, #sqrt{s} = 7 TeV");
+  label->DrawLatex(x,y-0.05,Form("L= %1.0f pb^{-1}",lumi));
+}
