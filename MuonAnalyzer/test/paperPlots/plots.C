@@ -173,8 +173,8 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
        grae1LKTsf->Draw("PSame");
        SetLegend(grae1sf, grae2sf, grae1LKTsf, head, leg1, leg2, leg3, "PL", "PL", "P");
      }
-     c_sf->Print(Form("%sSF.eps",type.Data()));
      SetLabel(0.6,0.88,36);
+     c_sf->Print(Form("%sSF.eps",type.Data()));
    }
 
    //SF for efficiency
@@ -194,9 +194,8 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
        grae1LKTsf->Draw("PSame");
        SetLegend(grae1sf, grae1LKTsf, head, "T&P", "LKT", "PL", "P");
      }
-
-     c_sf->Print(Form("%sSF.eps",type.Data()));
      SetLabel(0.6,0.88,36);
+     c_sf->Print(Form("%sSF.eps",type.Data()));
    }
 }
 
