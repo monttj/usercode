@@ -225,8 +225,8 @@ TGraphAsymmErrors * getSF(TGraphAsymmErrors * sig, TGraphAsymmErrors *bkg){
 
 TGraphAsymmErrors * getTemp(int min, int max){
   TGraphAsymmErrors * gr =  new TGraphAsymmErrors();
-  for(int i = min; i < max ; i++){
-    gr->SetPoint(i,i*0.01,0);
+  for(int i = 0; i < max ; i++){
+    gr->SetPoint(i,(i+min)*0.01,0);
   }
 
   return gr;

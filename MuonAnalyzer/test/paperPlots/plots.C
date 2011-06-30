@@ -102,27 +102,34 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      ROCDetectorTrkIsoMC(grae1mc);
    }
 
-   SetStyleGraphErrors(grae1data, datacolor1, 20, 0, 0.0, ytitle, xtitle, min, max);
-   SetStyleGraphErrors(grae2data, datacolor2, 20, 0, 0.0, ytitle, xtitle, min, max);
-   SetStyleGraphErrors(grae1mc, 2, 21, 0, 0.0, ytitle, xtitle, min, max);
-   SetStyleGraphErrors(grae1LKTdata, 4, 24, 0, 1.2, ytitle, xtitle, min, max);
-   SetStyleGraphErrors(grae1LKTmc, 6, 20, 0, 1.2, ytitle, xtitle, min, max);
+   SetStyleGraphErrors(grae1data, datacolor1, 20, 0, 0.9, ytitle, xtitle, min, max);
+   SetStyleGraphErrors(grae2data, datacolor2, 20, 0, 0.9, ytitle, xtitle, min, max);
+   SetStyleGraphErrors(grae1mc, 2, 21, 0, 0.9, ytitle, xtitle, min, max);
+   SetStyleGraphErrors(grae1LKTdata, 4, 24, 0, 0.9, ytitle, xtitle, min, max);
+   SetStyleGraphErrors(grae1LKTmc, 6, 20, 0, 0.9, ytitle, xtitle, min, max);
+
+   TGraphAsymmErrors *temp = new TGraphAsymmErrors();
+   temp = getTemp(1,27);
 
    //ISO draw
-   if( type.Contains("cEffPFBaseISO") ){
-     grae1data->Draw("APC");
-     grae1mc->Draw("PCSame");
-     SetLegend(grae1data, grae1mc, head, leg1, leg2, "PL", "PL");
-   }else if ( type.Contains("cEffDETBaseISO") ) {
-     grae1data->Draw("APC");
-     grae1mc->Draw("PCSame");
-     grae1LKTdata->Draw("PSame");
-     grae1LKTmc->Draw("PSame");
-     clearXErrorBar(grae1LKTdata);
-     clearXErrorBar(grae1LKTmc);
-     SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
+   if( type.Contains("cEffPFBaseISO") || type.Contains("cEffDETBaseISO") ){
+     SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, min, max);
+     temp->Draw("APC");
+     if( type.Contains("cEffPFBaseISO") ){
+       grae1data->Draw("PCSame");
+       grae1mc->Draw("PCSame");
+       SetLegend(grae1data, grae1mc, head, leg1, leg2, "PL", "PL");
+     }else if ( type.Contains("cEffDETBaseISO") ) {
+       grae1data->Draw("PCSame");
+       grae1mc->Draw("PCSame");
+       grae1LKTdata->Draw("PSame");
+       grae1LKTmc->Draw("PSame");
+       clearXErrorBar(grae1LKTdata);
+       clearXErrorBar(grae1LKTmc);
+       SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
+     }
    }
-  
+
    //PT draw
    if( type.Contains("cEffPFBasePT") ){
      grae1data->Draw("AP");
@@ -136,18 +143,21 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
    }
 
    //ROC draw
-   if( type.Contains("cROCPFBaseIso") || type.Contains("cROCDETBaseIsotrk") ){
-     grae1data->Draw("APC");
-     grae1mc->Draw("PCSame");
-     SetLegend(grae1data, grae1mc, head, leg1, leg2, "PL", "PL");
-   }else if ( type.Contains("cROCDETBaseIsorel") ) {
-     grae1data->Draw("APC");
-     grae1mc->Draw("PCSame");
-     grae1LKTdata->Draw("PSame");
-     grae1LKTmc->Draw("PSame");
-     clearXErrorBar(grae1LKTdata);
-     clearXErrorBar(grae1LKTmc);
-     SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
+   if( type.Contains("ROC") ){
+     SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, min, max);
+     if( type.Contains("cROCPFBaseIso") || type.Contains("cROCDETBaseIsotrk") ){
+       grae1data->Draw("APC");
+       grae1mc->Draw("PCSame");
+       SetLegend(grae1data, grae1mc, head, leg1, leg2, "PL", "PL");
+     }else if ( type.Contains("cROCDETBaseIsorel") ) {
+       grae1data->Draw("APC");
+       grae1mc->Draw("PCSame");
+       grae1LKTdata->Draw("PSame");
+       grae1LKTmc->Draw("PSame");
+       clearXErrorBar(grae1LKTdata);
+       clearXErrorBar(grae1LKTmc);
+       SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
+     }
    }
    SetLabel(0.6,0.6,36);
    c->Print(Form("%s.eps",type.Data()));
@@ -159,9 +169,9 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
 
      min = 0.75;
      max = 1.2;
-     SetStyleGraphErrors(grae1sf, 2, 20, 0, 0.0, "Data/MC", xtitle, min, max);
-     SetStyleGraphErrors(grae2sf, 4, 20, 0, 0.0, "Data/MC", xtitle, min, max);
-     SetStyleGraphErrors(grae1LKTsf, 4, 24, 0, 1.2, "Data/MC", xtitle, min, max);
+     SetStyleGraphErrors(grae1sf, 2, 20, 0, 0.9, "Data/MC", xtitle, min, max);
+     SetStyleGraphErrors(grae2sf, 4, 20, 0, 0.9, "Data/MC", xtitle, min, max);
+     SetStyleGraphErrors(grae1LKTsf, 4, 24, 0, 0.9, "Data/MC", xtitle, min, max);
 
      if( type.Contains("cEffPFBasePT") ){
        grae1sf->Draw("AP");
@@ -183,14 +193,17 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      SetStyleCanvas(c_sf);
      min = 0.93;
      max = 1.07;
-     SetStyleGraphErrors(grae1sf, 2, 20, 0, 0.0, "Data/MC", xtitle, min, max);
-     SetStyleGraphErrors(grae1LKTsf, 4, 24, 0, 1.2, "Data/MC", xtitle, min, max);
+     SetStyleGraphErrors(grae1sf, 2, 20, 0, 0.9, "Data/MC", xtitle, min, max);
+     SetStyleGraphErrors(grae1LKTsf, 4, 24, 0, 0.9, "Data/MC", xtitle, min, max);
+
+     SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, min, max);
+     temp->Draw("AP");
 
      if( type.Contains("cEffPFBaseISO") ){
-       grae1sf->Draw("AP");
+       grae1sf->Draw("PSame");
        SetLegend(grae1sf, head, "T&P",  "PL");
      }else if( type.Contains("cEffDETBaseISO") ){
-       grae1sf->Draw("APSame");
+       grae1sf->Draw("PSame");
        grae1LKTsf->Draw("PSame");
        SetLegend(grae1sf, grae1LKTsf, head, "T&P", "LKT", "PL", "P");
      }
@@ -305,10 +318,10 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
   temp=getTemp(1, 17);
   SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, 0.77, 1.02);
 
-  SetStyleGraphErrors(grae1ROCdetrel, 2, 23, 0, 0.0,  ytitle, xtitle, 0.8, 1.1);
-  SetStyleGraphErrors(grae1ROCdettrk, 3, 22, 0, 0.0, ytitle, xtitle, 0.8, 1.1);
-  SetStyleGraphErrors(grae1ROCpf, 4, 20, 0, 0.0, ytitle, xtitle, 0.8, 1.1);
-  SetStyleGraphErrors(grae1ROCLKT, 6, 20, 0, 1.1, ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCdetrel, 2, 23, 0, 0.9,  ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCdettrk, 3, 22, 0, 0.9, ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCpf, 4, 20, 0, 0.9, ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCLKT, 6, 20, 0, 0.9, ytitle, xtitle, 0.8, 1.1);
 
   //draw error band *****
   grae1ROCdetrel->SetFillColor(2);
@@ -322,12 +335,12 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
   //end draw error band *****
 
   temp->Draw("APC");
-  grae1ROCdetrel->Draw("3CSame");
-  grae1ROCdettrk->Draw("3CSame");
-  grae1ROCpf->Draw("3CSame");
+  grae1ROCdetrel->Draw("3CPSame");
+  grae1ROCdettrk->Draw("3CPSame");
+  grae1ROCpf->Draw("3CPSame");
   grae1ROCLKT->Draw("PSame");
 
-  SetLegend(grae1ROCpf, grae1ROCdetrel, grae1ROCdettrk, grae1ROCLKT, "Data", leg1, leg2, leg3, leg4, "PL","PL","PL","P");
+  SetLegend(grae1ROCpf, grae1ROCdetrel, grae1ROCdettrk, grae1ROCLKT, "Data", leg1, leg2, leg3, leg4, "PL","PL","PL","P",0.6, 0.20, 0.9,0.50);
   SetLabel(0.19,0.88,36);
 
   c->Print(Form("%s.eps",type.Data()));
@@ -335,9 +348,9 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
 
 void plots(){
    //Efficiency for pf
-   draw("cEffPFBaseISO", "Isolation Efficiency", "Isolation Threshold", "PF iso",  0.85, 1.01, "T&P Data", "T&P MC");
-   draw("cEffDETBaseISOrelLKT", "Isolation Efficiency", "Isolation Threshold", "Det iso (trk+calo)", 0.85, 1.01, "T&P Data", "T&P MC"); 
-   draw("cEffDETBaseISOtrkLKT", "Isolation Efficiency", "Isolation Threshold", "Det iso (trk-only)", 0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cEffPFBaseISO", "Isolation Efficiency", "Isolation Threshold", "\I_{PF}",  0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cEffDETBaseISOrelLKT", "Isolation Efficiency", "Isolation Threshold", "\I_{comb}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC"); 
+   draw("cEffDETBaseISOtrkLKT", "Isolation Efficiency", "Isolation Threshold", "\I_{trk}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
 
    //Efficiency for LKT : caution! it is different style
    //drawLKT("cEffLKTrel", "Isolation Efficiency", "RelIso", "LKT", "Data", "MC");
@@ -348,14 +361,14 @@ void plots(){
    drawLKT("cEffLKTNCal", "Isolation Efficiency", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu (MC)", "Z #rightarrow #mu#mu (Data)", "t#bar{t} #rightarrow ll (MC)", "SUSY (MC)");
 
    //Efficiency as a function of pT for PF
-   draw("cEffPFBasePT", "Isolation Efficiency", "p_{T} (GeV/c)", "PF iso",  0.5, 1.1, "T&P (Th. 0.12)", "T&P (Th. 0.20)");
-   draw("cEffDETBasePTtrk", "Isolation Efficiency", "p_{T} (GeV/c)", "Det iso (trk-only)", 0.5, 1.1, "T&P (Th. 0.05)", "T&P (Th. 0.10)", "LKT (Th. 0.10)");
-   draw("cEffDETBasePTrel", "Isolation Efficiency", "p_{T} (GeV/c)", "Det iso (trk+calo)", 0.5, 1.1, "T&P (Th. 0.10)", "T&P (Th. 0.15)", "LKT (Th. 0.15)");
+   draw("cEffPFBasePT", "Isolation Efficiency", "p_{T} (GeV/c)", "\I_{PF}",  0.5, 1.1, "T&P (Th. 0.12)", "T&P (Th. 0.20)");
+   draw("cEffDETBasePTtrk", "Isolation Efficiency", "p_{T} (GeV/c)", "\I_{trk}^{rel}", 0.5, 1.1, "T&P (Th. 0.05)", "T&P (Th. 0.10)", "LKT (Th. 0.10)");
+   draw("cEffDETBasePTrel", "Isolation Efficiency", "p_{T} (GeV/c)", "\I_{comb}^{rel}", 0.5, 1.1, "T&P (Th. 0.10)", "T&P (Th. 0.15)", "LKT (Th. 0.15)");
 
    //ROC for data all
-   drawROC("cROCallData","Signal Efficiency","Enhanced QCD Efficiency", "Data", "pflow (T&P)", "trk+calo (T&P)", "trk-only (T&P)", "trk+calo (LKT)");
-   draw("cROCPFBaseIso", "Signal Efficiency", "Enhanced QCD Efficiency", "PF iso",  0.85, 1.01, "T&P Data", "T&P MC");
-   draw("cROCDETBaseIsotrk", "Signal Efficiency", "Enhanced QCD Efficiency", "Det iso (trk-only)", 0.85, 1.01, "T&P Data", "T&P MC");
-   draw("cROCDETBaseIsorel", "Signal Efficiency", "Enhanced QCD Efficiency", "Det iso (trk+calo)", 0.85, 1.01, "T&P Data", "T&P MC");
+   drawROC("cROCallData","Signal Efficiency","Enhanced QCD Efficiency", "Data", "\I_{PF} (T&P)", "\I_{comb}^{rel} (T&P)", "\I_{trk}^{rel} (T&P)", "\I_{comb}^{rel} (LKT)");
+   draw("cROCPFBaseIso", "Signal Efficiency", "Enhanced QCD Efficiency", "\I_{PF}",  0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cROCDETBaseIsotrk", "Signal Efficiency", "Enhanced QCD Efficiency", "\I_{trk}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cROCDETBaseIsorel", "Signal Efficiency", "Enhanced QCD Efficiency", "\I_{comb}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
 
 }
