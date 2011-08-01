@@ -12,10 +12,10 @@
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsPt.h"
 #include "LKT_PLOTS/muonsFromZ_trkRel_EfficVsPt.h"
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsEta.h"
-#include "LKT_PLOTS/c_ROC_LKT_RelComb_DATAblack_MCWITHPUred.h"
+//#include "LKT_PLOTS/c_ROC_LKT_RelComb_DATAblack_MCWITHPUred.h"
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsNCaloTowers.h"
-#include "LKT_PLOTS/efficienciesData.h"
-#include "LKT_PLOTS/efficienciesMCwithPU.h"
+#include "LKT_PLOTS/efficiencies_data.h"
+#include "LKT_PLOTS/efficiencies_MC.h"
 
 void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  double min, double max, TString &leg1, TString& leg2, TString &leg3 = ""){
    TCanvas *c = new TCanvas(Form("%s",type.Data()), Form("%s",type.Data()) ,5,49,400,400);
@@ -91,7 +91,14 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
    }else if ( type.Contains("cROCDETBaseIsorel")){
      ROCDetectorRelIsoData(grae1data);
      ROCDetectorRelIsoMC(grae1mc);
-     ROCLKTIsoData(grae1LKTdata);
+     //data LKT
+     //ROCLKTIsoData(grae1LKTdata);
+     TGraphErrors *graeTbkgData = new TGraphErrors();
+     TGraphErrors *graeTsigData = new TGraphErrors();
+     EffLKTIsoData(graeTsigData);
+     SetDataQCDEffLKT(graeTbkgData);
+     grae1LKTdata = getROC(graeTsigData, graeTbkgData);
+     //mc LKT
      TGraphErrors *graeTbkg = new TGraphErrors();
      TGraphErrors *graeTsig = new TGraphErrors();
      EffLKTIsoMC(graeTsig);
@@ -126,7 +133,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
        grae1LKTmc->Draw("PSame");
        clearXErrorBar(grae1LKTdata);
        clearXErrorBar(grae1LKTmc);
-       SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
+       SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P",0.6, 0.20, 0.9,0.50);
      }
    }
 
@@ -156,7 +163,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
        grae1LKTmc->Draw("PSame");
        clearXErrorBar(grae1LKTdata);
        clearXErrorBar(grae1LKTmc);
-       SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P");
+       SetLegend(grae1data, grae1mc, grae1LKTdata, grae1LKTmc, head, leg1, leg2, "LKT Data", "LKT MC", "PL","PL","P","P",0.6, 0.20, 0.9,0.50);
      }
    }
    SetLabel(0.6,0.6,36);
@@ -309,19 +316,26 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
   ROCDetectorRelIsoData(grae1ROCdetrel);
   ROCDetectorTrkIsoData(grae1ROCdettrk);
   ROCParticleIsoData(grae1ROCpf);
-  ROCLKTIsoData(grae1ROCLKT);
+
+  TGraphErrors *graeTbkgData = new TGraphErrors();
+  TGraphErrors *graeTsigData = new TGraphErrors();
+  EffLKTIsoData(graeTsigData);
+  SetDataQCDEffLKT(graeTbkgData);
+  grae1ROCLKT = getROC(graeTsigData, graeTbkgData);
+
+  //ROCLKTIsoData(grae1ROCLKT);
  
   //limit trk ROC to 10 points 
   grae1ROCdettrk = getModifiedROC(grae1ROCdettrk, 10);
  
   TGraphAsymmErrors *temp = new TGraphAsymmErrors();
-  temp=getTemp(1, 17);
+  temp=getTemp(1, 14);
   SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, 0.77, 1.02);
 
-  SetStyleGraphErrors(grae1ROCdetrel, 2, 23, 0, 0.9,  ytitle, xtitle, 0.8, 1.1);
-  SetStyleGraphErrors(grae1ROCdettrk, 3, 22, 0, 0.9, ytitle, xtitle, 0.8, 1.1);
-  SetStyleGraphErrors(grae1ROCpf, 4, 20, 0, 0.9, ytitle, xtitle, 0.8, 1.1);
-  SetStyleGraphErrors(grae1ROCLKT, 6, 20, 0, 0.9, ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCdetrel, 2, 23, 0, 0.8,  ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCdettrk, 3, 22, 0, 0.8, ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCpf, 4, 20, 0, 0.8, ytitle, xtitle, 0.8, 1.1);
+  SetStyleGraphErrors(grae1ROCLKT, 6, 20, 0, 0.8, ytitle, xtitle, 0.8, 1.1);
 
   //draw error band *****
   grae1ROCdetrel->SetFillColor(2);
