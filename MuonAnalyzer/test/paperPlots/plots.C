@@ -12,8 +12,7 @@
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsPt.h"
 #include "LKT_PLOTS/muonsFromZ_trkRel_EfficVsPt.h"
 #include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsEta.h"
-//#include "LKT_PLOTS/c_ROC_LKT_RelComb_DATAblack_MCWITHPUred.h"
-#include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsNCaloTowers.h"
+#include "LKT_PLOTS/muonsFromZ_combinedRelative_EfficVsNCaloTowers_noSUSY.h"
 #include "LKT_PLOTS/efficiencies_data.h"
 #include "LKT_PLOTS/efficiencies_MC.h"
 
@@ -249,7 +248,7 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    c->Print(Form("%s.eps",type.Data()));
 }  
 
-void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TString &leg1, TString& leg2, TString& leg3){
+void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TString &leg1, TString& leg2, TString& leg3, double miny = 0.85, double maxy = 1.02){
 
    TCanvas *c = new TCanvas(Form("%s",type.Data()), Form("%s",type.Data()) ,5,49,400,400);
    SetStyleCanvas(c);
@@ -260,18 +259,26 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
 
    if( type.Contains("cEffLKTETA")){
      SetEffLKTETA(grae1, grae2, grae3);
+   }else if (type.Contains("cEffLKTNCal")){
+     SetEffLKTNCal(grae1, grae2, grae3);
    }
 
-   SetStyleGraphErrors(grae1, 2, 20, 0, 0.81, ytitle, xtitle, 0.85, 1.02);
-   SetStyleGraphErrors(grae2, 1, 21, 0, 0.81, ytitle, xtitle, 0.85, 1.02);
-   SetStyleGraphErrors(grae3, 3, 22, 0, 0.81, ytitle, xtitle, 0.85, 1.02);
+   SetStyleGraphErrors(grae1, 2, 20, 0, 0.81, ytitle, xtitle, miny, maxy);
+   SetStyleGraphErrors(grae2, 1, 21, 0, 0.81, ytitle, xtitle, miny, maxy);
+   SetStyleGraphErrors(grae3, 4, 22, 0, 0.81, ytitle, xtitle, miny, maxy);
 
    grae1->Draw("AP");
    grae2->Draw("PSame");
    grae3->Draw("PSame");
 
-   SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3, "PL","PL","PL", 0.6,0.20,0.9,0.40);
-   SetLabel(0.6,0.48,36);
+   if( type.Contains("cEffLKTETA")){
+     SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3,"PL","PL","PL", 0.6,0.20,0.9,0.40);
+     SetLabel(0.6,0.48,36);
+   }else if( type.Contains("cEffLKTNCal")){
+     SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3,"PL","PL","PL", 0.6,0.58,0.9,0.81);
+     SetLabel(0.6,0.88,36);
+   }
+
    c->Print(Form("%s.eps",type.Data()));
 }
 
@@ -372,7 +379,7 @@ void plots(){
    //drawLKT("cEffLKTPTrel", "Isolation Efficiency", "p_{T}", "LKT", "Data", "MC");
    //drawLKT("cEffLKTPTtrk", "Isolation Efficiency", "p_{T}", "LKT (track)", "Data", "MC");
    drawLKT("cEffLKTETA", "Isolation Efficiency", "#eta", "LKT, Z #rightarrow #mu#mu", "MC", "Data", "MC (PU=10)");
-   drawLKT("cEffLKTNCal", "Isolation Efficiency", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu (MC)", "Z #rightarrow #mu#mu (Data)", "t#bar{t} #rightarrow ll (MC)", "SUSY (MC)");
+   drawLKT("cEffLKTNCal", "Isolation Efficiency", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu (MC)", "Z #rightarrow #mu#mu (Data)", "t#bar{t} #rightarrow ll (MC)", 0.8, 1.02);
 
    //Efficiency as a function of pT for PF
    draw("cEffPFBasePT", "Isolation Efficiency", "p_{T} (GeV/c)", "\I_{PF}",  0.5, 1.1, "T&P (Th. 0.12)", "T&P (Th. 0.20)");
