@@ -202,7 +202,7 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      SetStyleGraphErrors(grae1sf, 2, 20, 0, 0.9, "Data/MC", xtitle, min, max);
      SetStyleGraphErrors(grae1LKTsf, 4, 24, 0, 0.9, "Data/MC", xtitle, min, max);
 
-     SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  ytitle, xtitle, min, max);
+     SetStyleGraphErrors(temp, 2, 23, 0, 0.0,  "Data/MC", xtitle, min, max);
      temp->Draw("AP");
 
      if( type.Contains("cEffPFBaseISO") ){
@@ -387,9 +387,9 @@ void plots(){
    draw("cEffDETBasePTrel", "Isolation Efficiency", "p_{T} (GeV/c)", "\I_{comb}^{rel}", 0.5, 1.1, "T&P (Th. 0.10)", "T&P (Th. 0.15)", "LKT (Th. 0.15)");
 
    //ROC for data all
-   drawROC("cROCallData","Signal Efficiency","Enhanced QCD Efficiency", "Data", "\I_{PF} (T&P)", "\I_{comb}^{rel} (T&P)", "\I_{trk}^{rel} (T&P)", "\I_{comb}^{rel} (LKT)");
-   draw("cROCPFBaseIso", "Signal Efficiency", "Enhanced QCD Efficiency", "\I_{PF}",  0.85, 1.01, "T&P Data", "T&P MC");
-   draw("cROCDETBaseIsotrk", "Signal Efficiency", "Enhanced QCD Efficiency", "\I_{trk}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
-   draw("cROCDETBaseIsorel", "Signal Efficiency", "Enhanced QCD Efficiency", "\I_{comb}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
+   drawROC("cROCallData","Signal Efficiency","Background Efficiency", "Data", "\I_{PF} (T&P)", "\I_{comb}^{rel} (T&P)", "\I_{trk}^{rel} (T&P)", "\I_{comb}^{rel} (LKT)");
+   draw("cROCPFBaseIso", "Signal Efficiency", "Background Efficiency", "\I_{PF}",  0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cROCDETBaseIsotrk", "Signal Efficiency", "Background Efficiency", "\I_{trk}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cROCDETBaseIsorel", "Signal Efficiency", "Background Efficiency", "\I_{comb}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
 
 }
