@@ -259,6 +259,9 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
 
    if( type.Contains("cEffLKTETA")){
      SetEffLKTETA(grae1, grae2, grae3);
+     clearXErrorBar(grae1);
+     clearXErrorBar(grae2);
+     clearXErrorBar(grae3);
    }else if (type.Contains("cEffLKTNCal")){
      SetEffLKTNCal(grae1, grae2, grae3);
    }
@@ -272,7 +275,7 @@ void drawLKT(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
    grae3->Draw("PSame");
 
    if( type.Contains("cEffLKTETA")){
-     SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3,"PL","PL","PL", 0.6,0.20,0.9,0.40);
+     SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3,"P","P","P", 0.6,0.20,0.9,0.40);
      SetLabel(0.6,0.48,36);
    }else if( type.Contains("cEffLKTNCal")){
      SetLegend(grae1, grae2, grae3, head, leg1, leg2, leg3,"PL","PL","PL", 0.6,0.58,0.9,0.81);
@@ -378,7 +381,7 @@ void plots(){
    //drawLKT("cEffLKTtrk", "Isolation Efficiency", "RelIso", "LKT (track)", "Data", "MC");
    //drawLKT("cEffLKTPTrel", "Isolation Efficiency", "p_{T}", "LKT", "Data", "MC");
    //drawLKT("cEffLKTPTtrk", "Isolation Efficiency", "p_{T}", "LKT (track)", "Data", "MC");
-   drawLKT("cEffLKTETA", "Isolation Efficiency", "#eta", "LKT, Z #rightarrow #mu#mu", "MC", "Data", "MC (PU=10)");
+   drawLKT("cEffLKTETA", "Isolation Efficiency", "#eta", "LKT, Z #rightarrow #mu#mu", "MC (PU=2.4)", "Data (PU=2.4)", "MC (PU=10)");
    drawLKT("cEffLKTNCal", "Isolation Efficiency", "Number of Active CaloTowers", "LKT", "Z #rightarrow #mu#mu (MC)", "Z #rightarrow #mu#mu (Data)", "t#bar{t} #rightarrow ll (MC)", 0.8, 1.02);
 
    //Efficiency as a function of pT for PF
