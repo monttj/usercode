@@ -179,9 +179,9 @@ TGraphErrors * getSF(TGraphErrors * sig, TGraphErrors *bkg){
     double bkgx;
     double bkgy;
     double sf = 0 ;
-    if( bkgy != 0 ) sf = sigy/bkgy;
     sig->GetPoint(i,sigx, sigy);
     bkg->GetPoint(i,bkgx, bkgy);
+    if( bkgy != 0 ) sf = sigy/bkgy;
     gr->SetPoint(i,sigx,sf);
   }
    

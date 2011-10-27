@@ -44,11 +44,15 @@ void draw(TString& type, TString& ytitle, TString& xtitle, TString& head,  doubl
      EffDetectorRelIsoMC(grae1mc);
      EffLKTIsoData(grae1LKTdata);
      EffLKTIsoMC(grae1LKTmc);
+     grae1LKTmc->RemovePoint(0);
+     grae1LKTdata->RemovePoint(0);
      grae1sf = getSF(grae1data, grae1mc);
      grae1LKTsf = getSF(grae1LKTdata, grae1LKTmc);
    }else if ( type.Contains("cEffDETBaseISOtrk")){
      EffDetectorTrkIsoData(grae1data);
      EffDetectorTrkIsoMC(grae1mc);
+     grae1data->RemovePoint(0);
+     grae1mc->RemovePoint(0);
      EffLKTTrkIsoData(grae1LKTdata);
      EffLKTTrkIsoMC(grae1LKTmc);
      grae1sf = getSF(grae1data, grae1mc);
@@ -372,9 +376,9 @@ void drawROC(TString& type, TString& ytitle, TString& xtitle, TString& head, TSt
 
 void plots(){
    //Efficiency for pf
-   draw("cEffPFBaseISO", "Isolation Efficiency", "Isolation Threshold", "\I_{PF}",  0.85, 1.01, "T&P Data", "T&P MC");
-   draw("cEffDETBaseISOrelLKT", "Isolation Efficiency", "Isolation Threshold", "\I_{comb}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC"); 
-   draw("cEffDETBaseISOtrkLKT", "Isolation Efficiency", "Isolation Threshold", "\I_{trk}^{rel}", 0.85, 1.01, "T&P Data", "T&P MC");
+   draw("cEffPFBaseISO", "Isolation Efficiency", "Isolation Threshold", "\I_{PF}",  0.83, 1.01, "T&P Data", "T&P MC");
+   draw("cEffDETBaseISOrelLKT", "Isolation Efficiency", "Isolation Threshold", "\I_{comb}^{rel}", 0.83, 1.01, "T&P Data", "T&P MC"); 
+   draw("cEffDETBaseISOtrkLKT", "Isolation Efficiency", "Isolation Threshold", "\I_{trk}^{rel}", 0.83, 1.01, "T&P Data", "T&P MC");
 
    //Efficiency for LKT : caution! it is different style
    //drawLKT("cEffLKTrel", "Isolation Efficiency", "RelIso", "LKT", "Data", "MC");
